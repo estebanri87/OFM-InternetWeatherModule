@@ -9,7 +9,7 @@ class OpenWeatherMapChannel : public BaseWeatherChannel
     void fillForecast(JsonObject& json, CurrentWheatherData& wheater);
     void fillForecast(JsonObject& json, ForecastHourWheatherData& wheater);
   protected:
-    int16_t fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherData& todayWeather, ForecastDayWheatherData& tomorrowWeather, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather) override;
+    int16_t fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather) override;
   
   public:
     OpenWeatherMapChannel(uint8_t index);

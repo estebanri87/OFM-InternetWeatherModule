@@ -15,7 +15,7 @@ const std::string OpenMeteoChannel::name()
     return "OpenMeteo";
 }
 
-int16_t OpenMeteoChannel::fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherData& todayWeather, ForecastDayWheatherData& tomorrowWeather, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather)
+int16_t OpenMeteoChannel::fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather)
 {
     // TODO check using csv-result
 
@@ -69,13 +69,14 @@ int16_t OpenMeteoChannel::fillWeather(CurrentWheatherData& currentWeather, Forec
     url += ",precipitation_probability";
 
     url += "&daily=";
-    url += "temperature_2m_min,temperature_2m_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,rain_sum,snowfall_sum,precipitation_probability_max,uv_index_max";
+    url += "temperature_2m_min,temperature_2m_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,rain_sum,snowfall_sum,precipitation_probability_max,uv_index_max,et0_fao_evapotranspiration";
 
     // allow easy finding of hour for forcast
     url += "&timeformat=unixtime";
 
     // depends on forecast length, current day is included in day count
-    url += "&forecast_days=2";
+    url += "&forecast_days=";
+    url += String(numDays);
 
 #ifdef OPENKNX_DEBUG
     const size_t urlLen = url.length();
@@ -101,9 +102,15 @@ int16_t OpenMeteoChannel::fillWeather(CurrentWheatherData& currentWeather, Forec
         return httpStatus;
     }
 
-    JsonDocument doc;
-    deserializeJson(doc, http.getString());
+    String jsonStr = http.getString();
     http.end();
+
+    JsonDocument doc;
+    DeserializationError jsonErr = deserializeJson(doc, jsonStr);
+    if (jsonErr) {
+        logErrorP("JSON parse error: %s", jsonErr.c_str());
+        return -2;
+    }
 
     JsonObject current = doc["current"];
     fillForecast(current, currentWeather);
@@ -131,8 +138,10 @@ int16_t OpenMeteoChannel::fillWeather(CurrentWheatherData& currentWeather, Forec
     */
     JsonObject daily = doc["daily"];
     JsonObject hourly = doc["hourly"];
-    fillForecast(daily, hourly, 0, todayWeather);
-    fillForecast(daily, hourly, 1, tomorrowWeather);
+    for (int i = 0; i < numDays; i++)
+    {
+        fillForecast(daily, hourly, i, dayForecasts[i]);
+    }
 
     /*
     "hourly_units": {
@@ -262,4 +271,7 @@ void OpenMeteoChannel::fillForecast(JsonObject& json, JsonObject& jsonHourly, in
 
     JsonArray hourlyCloud = jsonHourly["cloud_cover"];
     wheater.cloudsCover_percent = avg(hourlyCloud, vih, 24);
+
+    // ET₀ Reference Evapotranspiration (only available in Open-Meteo)
+    wheater.et0_mm = json["et0_fao_evapotranspiration"][vi];
 }

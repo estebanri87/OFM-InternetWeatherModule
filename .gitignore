@@ -7,3 +7,7 @@
 **/*.knxprod
 **/*.debug.xml
 release/*
+
+# Test/debug API response files
+*.json
+!library.json

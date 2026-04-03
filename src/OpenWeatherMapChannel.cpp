@@ -15,7 +15,7 @@ const std::string OpenWeatherMapChannel::name()
     return "OpenWeatherMap";
 }
 
-int16_t OpenWeatherMapChannel::fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherData& todayWeather, ForecastDayWheatherData& tomorrowWeather, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather)
+int16_t OpenWeatherMapChannel::fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather)
 {
     String url = OpenWeatherMapUrl;
     url += "&appid=";
@@ -40,17 +40,24 @@ int16_t OpenWeatherMapChannel::fillWeather(CurrentWheatherData& currentWeather, 
         return httpStatus;
     }
     JsonDocument doc;
-    deserializeJson(doc, http.getString());
+    DeserializationError jsonErr = deserializeJson(doc, http.getString());
     http.end();
+    if (jsonErr) {
+        logErrorP("JSON parse error: %s", jsonErr.c_str());
+        return -2;
+    }
 
     JsonObject current = doc["current"];
     fillForecast(current, currentWeather);
   
     JsonArray daily = doc["daily"];
-    JsonObject today = daily[0];
-    fillForecast(today, todayWeather);
-    JsonObject tomorrow = daily[1];
-    fillForecast(tomorrow, tomorrowWeather);
+    int availableDays = daily.size();
+    int daysToFill = (numDays < availableDays) ? numDays : availableDays;
+    for (int i = 0; i < daysToFill; i++)
+    {
+        JsonObject dayObj = daily[i];
+        fillForecast(dayObj, dayForecasts[i]);
+    }
 
     JsonArray hourly = doc["hourly"];
     JsonObject hour1 = hourly[1];
