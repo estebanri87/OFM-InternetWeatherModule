@@ -50,8 +50,7 @@ void BaseWeatherChannel::processInputKo(GroupObject& ko)
     switch (ko.asap())
     {
         case IW_KoRefreshWeatherData:
-            if (ko.value(DPT_Trigger))
-                fetchData();
+            fetchData();
             break;
     }
 }
@@ -67,6 +66,9 @@ void BaseWeatherChannel::loop()
         auto now = millis();
         if (now == 0)
             now++; // Do not use 0 because it is used as marker for unitialized
+
+        if (now < 60000)
+            return; // Wait 60s after startup before first fetch
 
         if (_updateIntervalInMs > 0 &&
             (_lastApiCall == 0 || (now - _lastApiCall > _updateIntervalInMs)))
@@ -169,6 +171,12 @@ void BaseWeatherChannel::setValueCompare(uint goNumber, const KNXValue& value, c
 
 void BaseWeatherChannel::fetchData()
 {
+    if (time(nullptr) < 1577836800LL)
+    {
+        logInfoP("NTP not yet synced, skipping weather fetch");
+        return;
+    }
+
     CurrentWheatherData current = CurrentWheatherData();
     ForecastHourWheatherData hour1 = ForecastHourWheatherData();
     ForecastHourWheatherData hour2 = ForecastHourWheatherData();
