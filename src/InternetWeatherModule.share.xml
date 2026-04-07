@@ -215,8 +215,12 @@
 								<!-- WeatherConditionSnow -->
 								<ParameterRefRef RefId="%AID%_UP-%TT%00008_R-%TT%0000801" HelpContext="IW-WeatherConditionSnow"             IndentLevel="1" />
 
-								<!-- Refresh Weather Data -->
-								<ComObjectRefRef RefId="%AID%_O-%TT%00001_R-%TT%0000101" />
+								<!-- Refresh Weather Data: nur sichtbar wenn mindestens 1 Kanal aktiviert -->
+								<choose ParamRefId="%AID%_UP-%TT%00000_R-%TT%0000001">
+									<when test="&gt;=1">
+										<ComObjectRefRef RefId="%AID%_O-%TT%00001_R-%TT%0000101" />
+									</when>
+								</choose>
 							</ParameterBlock>
 							<op:include href="InternetWeatherModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/*" type="template" prefix="IW" IsInner="true" />
 
