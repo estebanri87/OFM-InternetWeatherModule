@@ -2234,8 +2234,19 @@
 
                         <ParameterSeparator Id="%AID%_PS-nnn" Text=" " />
 
-                        <!-- Prognose Heute/Morgen Umschaltbar -->
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" HelpContext="IW-ForecastSelectable" />
+                        <!-- Prognose Heute/Morgen Umschaltbar (nur sichtbar wenn Prognose Heute und/oder Morgen aktiv) -->
+                        <choose ParamRefId="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201">
+                          <when test="1">
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" HelpContext="IW-ForecastSelectable" />
+                          </when>
+                          <when test="0">
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301">
+                              <when test="1">
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401" HelpContext="IW-ForecastSelectable" />
+                              </when>
+                            </choose>
+                          </when>
+                        </choose>
                         <choose ParamRefId="%AID%_UP-%TT%%CC%014_R-%TT%%CC%01401">                              <!-- Prognose Heute/Morgen Umschaltbar  -->
                           <when test="1">                                <!-- Ja -->
                             <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IW_ForecastSelectable"   Text="Prognose Heute/Morgen Umschaltbar"   Inline="true" ShowInComObjectTree="true">
@@ -2556,57 +2567,264 @@
                           </when>
                         </choose>
 
-                        <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Aktuelles Wetter" UIHint="Headline" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%030_R-%TT%%CC%03001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%031_R-%TT%%CC%03101" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%032_R-%TT%%CC%03201" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%033_R-%TT%%CC%03301" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%034_R-%TT%%CC%03401" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%035_R-%TT%%CC%03501" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%036_R-%TT%%CC%03601" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%037_R-%TT%%CC%03701" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%038_R-%TT%%CC%03801" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" />
+                        <choose ParamRefId="%AID%_UP-%TT%%CC%011_R-%TT%%CC%01101">
+                          <when test="1">
+                            <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Aktuelles Wetter" UIHint="Headline" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%030_R-%TT%%CC%03001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%031_R-%TT%%CC%03101" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%032_R-%TT%%CC%03201" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%033_R-%TT%%CC%03301" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%034_R-%TT%%CC%03401" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%035_R-%TT%%CC%03501" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%036_R-%TT%%CC%03601" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%037_R-%TT%%CC%03701" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%038_R-%TT%%CC%03801" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%039_R-%TT%%CC%03901" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%040_R-%TT%%CC%04001" />
+                          </when>
+                        </choose>
 
-                        <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                        <!-- Detailauswahl: Tagesprognose (nur sichtbar wenn mindestens eine Tagesprognose aktiv) -->
+                        <choose ParamRefId="%AID%_UP-%TT%%CC%012_R-%TT%%CC%01201">
+                          <when test="1">
+                            <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                          </when>
+                          <when test="0">
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%013_R-%TT%%CC%01301">
+                              <when test="1">
+                                <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                              </when>
+                              <when test="0">
+                                <choose ParamRefId="%AID%_UP-%TT%%CC%017_R-%TT%%CC%01701">
+                                  <when test="1">
+                                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                                  </when>
+                                  <when test="0">
+                                    <choose ParamRefId="%AID%_UP-%TT%%CC%018_R-%TT%%CC%01801">
+                                      <when test="1">
+                                        <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                                      </when>
+                                      <when test="0">
+                                        <choose ParamRefId="%AID%_UP-%TT%%CC%019_R-%TT%%CC%01901">
+                                          <when test="1">
+                                            <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                                          </when>
+                                          <when test="0">
+                                            <choose ParamRefId="%AID%_UP-%TT%%CC%020_R-%TT%%CC%02001">
+                                              <when test="1">
+                                                <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                                              </when>
+                                              <when test="0">
+                                                <choose ParamRefId="%AID%_UP-%TT%%CC%021_R-%TT%%CC%02101">
+                                                  <when test="1">
+                                                    <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Tagesprognose" UIHint="Headline" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%050_R-%TT%%CC%05001" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%051_R-%TT%%CC%05101" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%052_R-%TT%%CC%05201" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%053_R-%TT%%CC%05301" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%054_R-%TT%%CC%05401" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%055_R-%TT%%CC%05501" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%056_R-%TT%%CC%05601" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%057_R-%TT%%CC%05701" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%058_R-%TT%%CC%05801" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%059_R-%TT%%CC%05901" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%060_R-%TT%%CC%06001" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%061_R-%TT%%CC%06101" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%062_R-%TT%%CC%06201" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%063_R-%TT%%CC%06301" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%064_R-%TT%%CC%06401" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%065_R-%TT%%CC%06501" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%066_R-%TT%%CC%06601" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%067_R-%TT%%CC%06701" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%068_R-%TT%%CC%06801" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%069_R-%TT%%CC%06901" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%070_R-%TT%%CC%07001" />
+                                                    <ParameterRefRef RefId="%AID%_UP-%TT%%CC%071_R-%TT%%CC%07101" />
+                                                  </when>
+                                                </choose>
+                                              </when>
+                                            </choose>
+                                          </when>
+                                        </choose>
+                                      </when>
+                                    </choose>
+                                  </when>
+                                </choose>
+                              </when>
+                            </choose>
+                          </when>
+                        </choose>
 
-                        <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Stundenprognose" UIHint="Headline" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%080_R-%TT%%CC%08001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%081_R-%TT%%CC%08101" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%082_R-%TT%%CC%08201" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%083_R-%TT%%CC%08301" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%085_R-%TT%%CC%08501" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%086_R-%TT%%CC%08601" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%087_R-%TT%%CC%08701" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%088_R-%TT%%CC%08801" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%089_R-%TT%%CC%08901" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%090_R-%TT%%CC%09001" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%091_R-%TT%%CC%09101" />
-                        <ParameterRefRef RefId="%AID%_UP-%TT%%CC%092_R-%TT%%CC%09201" />
+                        <choose ParamRefId="%AID%_UP-%TT%%CC%015_R-%TT%%CC%01501">
+                          <when test="1">
+                            <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Stundenprognose" UIHint="Headline" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%080_R-%TT%%CC%08001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%081_R-%TT%%CC%08101" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%082_R-%TT%%CC%08201" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%083_R-%TT%%CC%08301" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%085_R-%TT%%CC%08501" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%086_R-%TT%%CC%08601" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%087_R-%TT%%CC%08701" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%088_R-%TT%%CC%08801" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%089_R-%TT%%CC%08901" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%090_R-%TT%%CC%09001" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%091_R-%TT%%CC%09101" />
+                            <ParameterRefRef RefId="%AID%_UP-%TT%%CC%092_R-%TT%%CC%09201" />
+                          </when>
+                          <when test="0">
+                            <choose ParamRefId="%AID%_UP-%TT%%CC%016_R-%TT%%CC%01601">
+                              <when test="1">
+                                <ParameterSeparator Id="%AID%_PS-nnn" Text="Detailauswahl: Stundenprognose" UIHint="Headline" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%080_R-%TT%%CC%08001" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%081_R-%TT%%CC%08101" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%082_R-%TT%%CC%08201" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%083_R-%TT%%CC%08301" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%084_R-%TT%%CC%08401" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%085_R-%TT%%CC%08501" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%086_R-%TT%%CC%08601" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%087_R-%TT%%CC%08701" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%088_R-%TT%%CC%08801" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%089_R-%TT%%CC%08901" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%090_R-%TT%%CC%09001" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%091_R-%TT%%CC%09101" />
+                                <ParameterRefRef RefId="%AID%_UP-%TT%%CC%092_R-%TT%%CC%09201" />
+                              </when>
+                            </choose>
+                          </when>
+                        </choose>
 
                       </when>
                     </choose>
