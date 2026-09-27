@@ -5,6 +5,7 @@
 * Change: Deaktivierte Kanäle erscheinen nicht mehr in der Baumansicht; die Beschreibung bleibt trotzdem eingebbar
 * Change: "Bezeichnung" heißt jetzt durchgängig "Beschreibung"
 * Breaking: Der Kanalzähler entfällt – bestehende Projekte müssen die Kanäle neu aktivieren
+* Fix: Ein neu angelegter Kanal ist standardmäßig "Deaktiviert" statt "Open-Meteo"
 
 
 # (upcoming) v0.5.1

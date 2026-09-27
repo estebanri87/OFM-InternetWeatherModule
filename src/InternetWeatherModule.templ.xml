@@ -110,7 +110,7 @@
               <!-- Weather channel type -->
               <Union SizeInBit="8">
                 <Memory CodeSegment="%MID%" Offset="2" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%001" Name="CH%C%WeatherChannelType" ParameterType="%AID%_PT-WeatherChannelType" Offset="0" BitOffset="0" Text="Wetterdienst" Value="2" />
+                <Parameter Id="%AID%_UP-%TT%%CC%001" Name="CH%C%WeatherChannelType" ParameterType="%AID%_PT-WeatherChannelType" Offset="0" BitOffset="0" Text="Wetterdienst" Value="0" />
               </Union>
 
               <!-- TypeSelect: kein Union, keine Memory-Referenz -> nur in ETS gespeichert, nicht auf dem Geraet -->
