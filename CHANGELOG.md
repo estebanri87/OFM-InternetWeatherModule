@@ -1,3 +1,12 @@
+# (upcoming) v0.6.0
+
+* Change: Kanalauswahl nach OpenKNX-Standard – eigener Tab "Kanalauswahl" mit einer Zeile je Kanal (Kanal / Wetterdienst / Beschreibung)
+* Change: Der Schieberegler "Verfügbare Kanäle" und der Tab "(mehr)" entfallen; ein Kanal wird über "Deaktiviert" beim Wetterdienst abgeschaltet
+* Change: Deaktivierte Kanäle erscheinen nicht mehr in der Baumansicht; die Beschreibung bleibt trotzdem eingebbar
+* Change: "Bezeichnung" heißt jetzt durchgängig "Beschreibung"
+* Breaking: Der Kanalzähler entfällt – bestehende Projekte müssen die Kanäle neu aktivieren
+
+
 # (upcoming) v0.5.1
 
 * Fix: Open-Meteo API hatte die komplette Basis-URL überschrieben
