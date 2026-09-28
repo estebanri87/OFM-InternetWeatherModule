@@ -11,3 +11,4 @@ release/*
 # Test/debug API response files
 *.json
 !library.json
+!src/weather-catalog.json

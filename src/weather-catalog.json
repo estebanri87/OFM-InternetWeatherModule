@@ -1,0 +1,116 @@
+{
+  "_comment": [
+    "Messwert-Katalog des OFM-InternetWeatherModule (Datenquelle: Open-Meteo Forecast API).",
+    "Diese Datei ist die einzige Pflegestelle. Aus ihr erzeugt tools/Generate-Catalog.ps1:",
+    "  - src/InternetWeatherModule.catalog.part.xml  (ETS-ParameterTypes)",
+    "  - src/InternetWeatherModule.slot.part.xml     (ETS-Slot-Block inkl. choose-Listen)",
+    "  - src/WeatherCatalog.gen.h                    (C++-Tabelle)",
+    "ID-Schema: Die Kategorie steckt im High-Nibble (id >> 4), damit die Firmware sie ohne",
+    "eigenen Parameter ableiten kann. ID 0 bedeutet: nicht verwendet.",
+    "omVariable mit fuehrendem @ ist keine API-Variable, sondern ein im Modul berechneter Wert.",
+    "Die Verfuegbarkeit je Zeitebene ist gegen die Open-Meteo-API zu verifizieren",
+    "(tools/Verify-Catalog.ps1), die API-Dokumentation ist an mehreren Stellen ungenau."
+  ],
+
+  "levels": [
+    { "key": "current",     "label": "Aktueller Wert",   "suffix": "Aktuell",          "unitText": "",            "slotSeconds": 0,     "offsetMin": 0,    "offsetMax": 0 },
+    { "key": "minutely_15", "label": "15-Minuten-Werte", "suffix": "15-Minuten-Werte", "unitText": "1/4 Stunden", "slotSeconds": 900,   "offsetMin": -192, "offsetMax": 671, "maxSpan": 96 },
+    { "key": "hourly",      "label": "Stundenwerte",     "suffix": "Stundenwerte",     "unitText": "Stunden",     "slotSeconds": 3600,  "offsetMin": -48,  "offsetMax": 167, "maxSpan": 48 },
+    { "key": "daily",       "label": "Tageswerte",       "suffix": "Tageswerte",       "unitText": "Tage",        "slotSeconds": 86400, "offsetMin": -2,   "offsetMax": 6,   "maxSpan": 7 }
+  ],
+
+  "aggregations": [
+    { "value": 0, "key": "mean", "label": "Mittelwert (Durchschnitt)" },
+    { "value": 1, "key": "min",  "label": "Minimum" },
+    { "value": 2, "key": "max",  "label": "Maximum" },
+    { "value": 3, "key": "sum",  "label": "Summe" }
+  ],
+
+  "categories": [
+    { "value": 1, "key": "uebersicht",       "label": "Zusammenfassung und Überblick", "icon": "text-box-outline" },
+    { "value": 2, "key": "temperatur",       "label": "Temperatur",                    "icon": "thermometer" },
+    { "value": 3, "key": "feuchte_druck",    "label": "Feuchte und Druck",             "icon": "water-percent" },
+    { "value": 4, "key": "wind",             "label": "Wind",                          "icon": "weather-windy" },
+    { "value": 5, "key": "niederschlag",     "label": "Niederschlag",                  "icon": "weather-pouring" },
+    { "value": 6, "key": "bewoelkung_sonne", "label": "Bewölkung und Sonne",           "icon": "weather-partly-cloudy" },
+    { "value": 7, "key": "strahlung",        "label": "Strahlung",                     "icon": "sun-wireless-outline" },
+    { "value": 8, "key": "landwirtschaft",   "label": "Landwirtschaft",                "icon": "sprout-outline" }
+  ],
+
+  "measurements": [
+    { "id": 16,  "category": "uebersicht",       "label": "OpenKNX Wetter-Text",                    "level": "daily",       "omVariable": "@openknx_text",               "dpt": "DPST-16-1", "objectSize": "14 Bytes", "scale": 1.0,   "aggregatable": false },
+    { "id": 17,  "category": "uebersicht",       "label": "Wettercode (WMO)",                       "level": "current",     "omVariable": "weather_code",                "dpt": "DPST-5-10", "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+    { "id": 18,  "category": "uebersicht",       "label": "Wettercode (WMO)",                       "level": "hourly",      "omVariable": "weather_code",                "dpt": "DPST-5-10", "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+    { "id": 19,  "category": "uebersicht",       "label": "Wettercode (WMO)",                       "level": "daily",       "omVariable": "weather_code",                "dpt": "DPST-5-10", "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+
+    { "id": 32,  "category": "temperatur",       "label": "Temperatur (2 m)",                       "level": "current",     "omVariable": "temperature_2m",              "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 33,  "category": "temperatur",       "label": "Temperatur (2 m)",                       "level": "minutely_15", "omVariable": "temperature_2m",              "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 34,  "category": "temperatur",       "label": "Temperatur (2 m)",                       "level": "hourly",      "omVariable": "temperature_2m",              "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 35,  "category": "temperatur",       "label": "Temperatur (2 m) Maximum",               "level": "daily",       "omVariable": "temperature_2m_max",          "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 36,  "category": "temperatur",       "label": "Temperatur (2 m) Minimum",               "level": "daily",       "omVariable": "temperature_2m_min",          "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 37,  "category": "temperatur",       "label": "Temperatur (2 m) Mittel",                "level": "daily",       "omVariable": "temperature_2m_mean",         "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 38,  "category": "temperatur",       "label": "Gefühlte Temperatur",                    "level": "current",     "omVariable": "apparent_temperature",        "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 39,  "category": "temperatur",       "label": "Gefühlte Temperatur",                    "level": "minutely_15", "omVariable": "apparent_temperature",        "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 40,  "category": "temperatur",       "label": "Gefühlte Temperatur",                    "level": "hourly",      "omVariable": "apparent_temperature",        "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 41,  "category": "temperatur",       "label": "Gefühlte Temperatur Maximum",            "level": "daily",       "omVariable": "apparent_temperature_max",    "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 42,  "category": "temperatur",       "label": "Gefühlte Temperatur Minimum",            "level": "daily",       "omVariable": "apparent_temperature_min",    "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 43,  "category": "temperatur",       "label": "Gefühlte Temperatur Mittel",             "level": "daily",       "omVariable": "apparent_temperature_mean",   "dpt": "DPST-9-1",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+
+    { "id": 48,  "category": "feuchte_druck",    "label": "Relative Luftfeuchte (2 m)",             "level": "current",     "omVariable": "relative_humidity_2m",        "dpt": "DPST-9-7",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 49,  "category": "feuchte_druck",    "label": "Relative Luftfeuchte (2 m)",             "level": "minutely_15", "omVariable": "relative_humidity_2m",        "dpt": "DPST-9-7",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 50,  "category": "feuchte_druck",    "label": "Relative Luftfeuchte (2 m)",             "level": "hourly",      "omVariable": "relative_humidity_2m",        "dpt": "DPST-9-7",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 51,  "category": "feuchte_druck",    "label": "Luftdruck",                              "level": "current",     "omVariable": "surface_pressure",            "dpt": "DPST-9-6",  "objectSize": "2 Bytes",  "scale": 100.0, "aggregatable": true },
+    { "id": 52,  "category": "feuchte_druck",    "label": "Luftdruck",                              "level": "hourly",      "omVariable": "surface_pressure",            "dpt": "DPST-9-6",  "objectSize": "2 Bytes",  "scale": 100.0, "aggregatable": true },
+
+    { "id": 64,  "category": "wind",             "label": "Windgeschwindigkeit (10 m)",             "level": "current",     "omVariable": "wind_speed_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 65,  "category": "wind",             "label": "Windgeschwindigkeit (10 m)",             "level": "minutely_15", "omVariable": "wind_speed_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 66,  "category": "wind",             "label": "Windgeschwindigkeit (10 m)",             "level": "hourly",      "omVariable": "wind_speed_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 67,  "category": "wind",             "label": "Windgeschwindigkeit (10 m) Maximum",     "level": "daily",       "omVariable": "wind_speed_10m_max",          "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 68,  "category": "wind",             "label": "Windböen (10 m)",                        "level": "current",     "omVariable": "wind_gusts_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 69,  "category": "wind",             "label": "Windböen (10 m)",                        "level": "minutely_15", "omVariable": "wind_gusts_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 70,  "category": "wind",             "label": "Windböen (10 m)",                        "level": "hourly",      "omVariable": "wind_gusts_10m",              "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 71,  "category": "wind",             "label": "Windböen (10 m) Maximum",                "level": "daily",       "omVariable": "wind_gusts_10m_max",          "dpt": "DPST-9-28", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 72,  "category": "wind",             "label": "Windrichtung (10 m)",                    "level": "current",     "omVariable": "wind_direction_10m",          "dpt": "DPST-5-3",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+    { "id": 73,  "category": "wind",             "label": "Windrichtung (10 m)",                    "level": "minutely_15", "omVariable": "wind_direction_10m",          "dpt": "DPST-5-3",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+    { "id": 74,  "category": "wind",             "label": "Windrichtung (10 m)",                    "level": "hourly",      "omVariable": "wind_direction_10m",          "dpt": "DPST-5-3",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+    { "id": 75,  "category": "wind",             "label": "Windrichtung (10 m) vorherrschend",      "level": "daily",       "omVariable": "wind_direction_10m_dominant", "dpt": "DPST-5-3",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": false },
+
+    { "id": 80,  "category": "niederschlag",     "label": "Niederschlag",                           "level": "current",     "omVariable": "precipitation",               "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 81,  "category": "niederschlag",     "label": "Niederschlag",                           "level": "minutely_15", "omVariable": "precipitation",               "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 82,  "category": "niederschlag",     "label": "Niederschlag",                           "level": "hourly",      "omVariable": "precipitation",               "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 83,  "category": "niederschlag",     "label": "Niederschlag Summe",                     "level": "daily",       "omVariable": "precipitation_sum",           "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 84,  "category": "niederschlag",     "label": "Regen",                                  "level": "current",     "omVariable": "rain",                        "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 85,  "category": "niederschlag",     "label": "Regen",                                  "level": "minutely_15", "omVariable": "rain",                        "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 86,  "category": "niederschlag",     "label": "Regen",                                  "level": "hourly",      "omVariable": "rain",                        "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 87,  "category": "niederschlag",     "label": "Regen Summe",                            "level": "daily",       "omVariable": "rain_sum",                    "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 88,  "category": "niederschlag",     "label": "Schneefall",                             "level": "current",     "omVariable": "snowfall",                    "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 10.0,  "aggregatable": true },
+    { "id": 89,  "category": "niederschlag",     "label": "Schneefall",                             "level": "minutely_15", "omVariable": "snowfall",                    "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 10.0,  "aggregatable": true },
+    { "id": 90,  "category": "niederschlag",     "label": "Schneefall",                             "level": "hourly",      "omVariable": "snowfall",                    "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 10.0,  "aggregatable": true },
+    { "id": 91,  "category": "niederschlag",     "label": "Schneefall Summe",                       "level": "daily",       "omVariable": "snowfall_sum",                "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 10.0,  "aggregatable": true },
+    { "id": 92,  "category": "niederschlag",     "label": "Niederschlagswahrscheinlichkeit",        "level": "hourly",      "omVariable": "precipitation_probability",   "dpt": "DPST-5-1",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": true },
+    { "id": 93,  "category": "niederschlag",     "label": "Niederschlagswahrscheinlichkeit Maximum","level": "daily",       "omVariable": "precipitation_probability_max","dpt": "DPST-5-1", "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": true },
+
+    { "id": 96,  "category": "bewoelkung_sonne", "label": "Bewölkung",                              "level": "current",     "omVariable": "cloud_cover",                 "dpt": "DPST-5-1",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": true },
+    { "id": 97,  "category": "bewoelkung_sonne", "label": "Bewölkung",                              "level": "hourly",      "omVariable": "cloud_cover",                 "dpt": "DPST-5-1",  "objectSize": "1 Byte",   "scale": 1.0,   "aggregatable": true },
+    { "id": 98,  "category": "bewoelkung_sonne", "label": "Sonnenscheindauer",                      "level": "hourly",      "omVariable": "sunshine_duration",           "dpt": "DPST-7-5",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 99,  "category": "bewoelkung_sonne", "label": "Sonnenscheindauer",                      "level": "daily",       "omVariable": "sunshine_duration",           "dpt": "DPST-7-5",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 100, "category": "bewoelkung_sonne", "label": "Tageslichtdauer",                        "level": "daily",       "omVariable": "daylight_duration",           "dpt": "DPST-7-5",  "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 101, "category": "bewoelkung_sonne", "label": "Sonnenaufgang",                          "level": "daily",       "omVariable": "sunrise",                     "dpt": "DPST-10-1", "objectSize": "3 Bytes",  "scale": 1.0,   "aggregatable": false },
+    { "id": 102, "category": "bewoelkung_sonne", "label": "Sonnenuntergang",                        "level": "daily",       "omVariable": "sunset",                      "dpt": "DPST-10-1", "objectSize": "3 Bytes",  "scale": 1.0,   "aggregatable": false },
+
+    { "id": 112, "category": "strahlung",        "label": "Globalstrahlung",                        "level": "minutely_15", "omVariable": "shortwave_radiation",         "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 113, "category": "strahlung",        "label": "Globalstrahlung",                        "level": "hourly",      "omVariable": "shortwave_radiation",         "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 114, "category": "strahlung",        "label": "Direktstrahlung",                        "level": "minutely_15", "omVariable": "direct_radiation",            "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 115, "category": "strahlung",        "label": "Direktstrahlung",                        "level": "hourly",      "omVariable": "direct_radiation",            "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 116, "category": "strahlung",        "label": "Diffusstrahlung",                        "level": "minutely_15", "omVariable": "diffuse_radiation",           "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 117, "category": "strahlung",        "label": "Diffusstrahlung",                        "level": "hourly",      "omVariable": "diffuse_radiation",           "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 118, "category": "strahlung",        "label": "Direktnormalstrahlung",                  "level": "minutely_15", "omVariable": "direct_normal_irradiance",    "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 119, "category": "strahlung",        "label": "Direktnormalstrahlung",                  "level": "hourly",      "omVariable": "direct_normal_irradiance",    "dpt": "DPST-9-22", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 120, "category": "strahlung",        "label": "UV-Index",                               "level": "current",     "omVariable": "uv_index",                    "dpt": "DPST-9-31", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 121, "category": "strahlung",        "label": "UV-Index",                               "level": "hourly",      "omVariable": "uv_index",                    "dpt": "DPST-9-31", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 122, "category": "strahlung",        "label": "UV-Index Maximum",                       "level": "daily",       "omVariable": "uv_index_max",                "dpt": "DPST-9-31", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+
+    { "id": 128, "category": "landwirtschaft",   "label": "ET0 Referenz-Verdunstung",               "level": "hourly",      "omVariable": "et0_fao_evapotranspiration",  "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true },
+    { "id": 129, "category": "landwirtschaft",   "label": "ET0 Referenz-Verdunstung Summe",         "level": "daily",       "omVariable": "et0_fao_evapotranspiration",  "dpt": "DPST-9-26", "objectSize": "2 Bytes",  "scale": 1.0,   "aggregatable": true }
+  ]
+}
