@@ -38,15 +38,21 @@
 									<Enumeration Text="Jede Stunde" Value="3" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<!-- Kanalauswahl nach OpenKNX-Standard, Aktiv/Inaktiv-Variante:
-							     seit dem Wegfall von OpenWeatherMap gibt es nur noch einen Dienst,
-							     damit entfallen TypeSelect und BASE_SyncChannelType.
-							     Kein UIHint="RadioButton" - der Wert ist im KNX-Schema ungueltig,
-							     eine 1-Bit-TypeRestriction rendert die ETS automatisch als Radio-Button. -->
-							<ParameterType Id="%AID%_PT-IWChannelActive" Name="IWChannelActive">
-								<TypeRestriction Base="Value" SizeInBit="1">
-									<Enumeration Text="Deaktiviert" Value="0" Id="%ENID%" />
-									<Enumeration Text="Aktiviert"   Value="1" Id="%ENID%" />
+							<!-- Kanalauswahl nach OpenKNX-Standard, Typ-Variante: der Wetter-Service
+							     ist der Kanaltyp und wird in der Kanalauswahl-Tabelle gewählt.
+							     Er steuert zugleich, welche Kategorien und Messwerte ein Slot anbietet. -->
+							<ParameterType Id="%AID%_PT-WeatherChannelType" Name="WeatherChannelType" op:headerExport="enum" op:headerName="ChannelType">
+								<TypeRestriction Base="Value" SizeInBit="4" UIHint="DropDown">
+									<Enumeration Text="Deaktiviert"    Value="0" Id="%ENID%" op:headerName="None" />
+									<Enumeration Text="OpenWeatherMap" Value="1" Id="%ENID%" op:headerName="OpenWeatherMap" Icon="weather-partly-snowy-rainy" />
+									<Enumeration Text="Open-Meteo"     Value="2" Id="%ENID%" op:headerName="OpenMeteo" Icon="white-balance-sunny" />
+								</TypeRestriction>
+							</ParameterType>
+							<!-- Kanal-Tab: Typwechsel ohne "Deaktiviert", synchron zur Kanalauswahl -->
+							<ParameterType Id="%AID%_PT-WeatherChannelTypeSelect" Name="WeatherChannelTypeSelect" op:headerExport="base" op:headerName="ChannelType">
+								<TypeRestriction Base="Value" SizeInBit="4" UIHint="DropDown">
+									<Enumeration Text="OpenWeatherMap" Value="1" Id="%ENID%" Icon="weather-partly-snowy-rainy" />
+									<Enumeration Text="Open-Meteo"     Value="2" Id="%ENID%" Icon="white-balance-sunny" />
 								</TypeRestriction>
 							</ParameterType>
 
@@ -59,10 +65,10 @@
 								</TypeRestriction>
 							</ParameterType>
 
-							<!-- BEGIN GENERATED CATALOG - erzeugt von tools/Generate-Catalog.ps1 aus src/weather-catalog.json, nicht von Hand aendern -->
-							<ParameterType Id="%AID%_PT-IWCategory" Name="IWCategory" op:headerExport="enum" op:headerName="Category">
+							<!-- BEGIN GENERATED CATALOG - erzeugt von tools/Generate-Catalog.ps1 aus src/weather-catalog.json, nicht von Hand ändern -->
+							<ParameterType Id="%AID%_PT-IWCategoryOpenweathermap" Name="IWCategoryOpenweathermap" op:headerExport="enum" op:headerName="Category">
 								<TypeRestriction Base="Value" SizeInBit="4" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" op:headerName="None" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" op:headerName="None" />
 									<Enumeration Text="Zusammenfassung und Überblick" Value="1" Id="%ENID%" op:headerName="Uebersicht" Icon="format-list-text" />
 									<Enumeration Text="Temperatur" Value="2" Id="%ENID%" op:headerName="Temperatur" Icon="thermometer" />
 									<Enumeration Text="Feuchte und Druck" Value="3" Id="%ENID%" op:headerName="FeuchteDruck" Icon="water-percent" />
@@ -70,189 +76,311 @@
 									<Enumeration Text="Niederschlag" Value="5" Id="%ENID%" op:headerName="Niederschlag" Icon="weather-pouring" />
 									<Enumeration Text="Bewölkung und Sonne" Value="6" Id="%ENID%" op:headerName="BewoelkungSonne" Icon="weather-partly-cloudy" />
 									<Enumeration Text="Strahlung" Value="7" Id="%ENID%" op:headerName="Strahlung" Icon="white-balance-sunny" />
-									<Enumeration Text="Landwirtschaft" Value="8" Id="%ENID%" op:headerName="Landwirtschaft" Icon="leak" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWCategoryOpenmeteo" Name="IWCategoryOpenmeteo" op:headerExport="base" op:headerName="Category">
+								<TypeRestriction Base="Value" SizeInBit="4" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Zusammenfassung und Überblick" Value="1" Id="%ENID%" Icon="format-list-text" />
+									<Enumeration Text="Temperatur" Value="2" Id="%ENID%" Icon="thermometer" />
+									<Enumeration Text="Feuchte und Druck" Value="3" Id="%ENID%" Icon="water-percent" />
+									<Enumeration Text="Wind" Value="4" Id="%ENID%" Icon="windsock" />
+									<Enumeration Text="Niederschlag" Value="5" Id="%ENID%" Icon="weather-pouring" />
+									<Enumeration Text="Bewölkung und Sonne" Value="6" Id="%ENID%" Icon="weather-partly-cloudy" />
+									<Enumeration Text="Strahlung" Value="7" Id="%ENID%" Icon="white-balance-sunny" />
+									<Enumeration Text="Landwirtschaft" Value="8" Id="%ENID%" Icon="leak" />
 								</TypeRestriction>
 							</ParameterType>
 
 							<!-- Schattenparameter-Typ: einziger choose-Treiber, erzeugt enum class PT_Measurand -->
 							<ParameterType Id="%AID%_PT-IWMeasurandAll" Name="IWMeasurandAll" op:headerExport="enum" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" op:headerName="None" />
-									<Enumeration Text="OpenKNX Wetter-Text - Tageswerte" Value="16" Id="%ENID%" op:headerName="OpenKNXWetterTextDay" />
-									<Enumeration Text="Wettercode (WMO) - Aktuell" Value="17" Id="%ENID%" op:headerName="WettercodeWMOCur" />
-									<Enumeration Text="Wettercode (WMO) - Stundenwerte" Value="18" Id="%ENID%" op:headerName="WettercodeWMOHour" />
-									<Enumeration Text="Wettercode (WMO) - Tageswerte" Value="19" Id="%ENID%" op:headerName="WettercodeWMODay" />
-									<Enumeration Text="Temperatur (2 m) - Aktuell" Value="32" Id="%ENID%" op:headerName="Temperatur2MCur" />
-									<Enumeration Text="Temperatur (2 m) - 15-Minuten-Werte" Value="33" Id="%ENID%" op:headerName="Temperatur2MQ15" />
-									<Enumeration Text="Temperatur (2 m) - Stundenwerte" Value="34" Id="%ENID%" op:headerName="Temperatur2MHour" />
-									<Enumeration Text="Temperatur (2 m) Maximum - Tageswerte" Value="35" Id="%ENID%" op:headerName="Temperatur2MMaximumDay" />
-									<Enumeration Text="Temperatur (2 m) Minimum - Tageswerte" Value="36" Id="%ENID%" op:headerName="Temperatur2MMinimumDay" />
-									<Enumeration Text="Temperatur (2 m) Mittel - Tageswerte" Value="37" Id="%ENID%" op:headerName="Temperatur2MMittelDay" />
-									<Enumeration Text="Gefühlte Temperatur - Aktuell" Value="38" Id="%ENID%" op:headerName="GefuehlteTemperaturCur" />
-									<Enumeration Text="Gefühlte Temperatur - 15-Minuten-Werte" Value="39" Id="%ENID%" op:headerName="GefuehlteTemperaturQ15" />
-									<Enumeration Text="Gefühlte Temperatur - Stundenwerte" Value="40" Id="%ENID%" op:headerName="GefuehlteTemperaturHour" />
-									<Enumeration Text="Gefühlte Temperatur Maximum - Tageswerte" Value="41" Id="%ENID%" op:headerName="GefuehlteTemperaturMaximumDay" />
-									<Enumeration Text="Gefühlte Temperatur Minimum - Tageswerte" Value="42" Id="%ENID%" op:headerName="GefuehlteTemperaturMinimumDay" />
-									<Enumeration Text="Gefühlte Temperatur Mittel - Tageswerte" Value="43" Id="%ENID%" op:headerName="GefuehlteTemperaturMittelDay" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="48" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MCur" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - 15-Minuten-Werte" Value="49" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MQ15" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="50" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MHour" />
-									<Enumeration Text="Luftdruck - Aktuell" Value="51" Id="%ENID%" op:headerName="LuftdruckCur" />
-									<Enumeration Text="Luftdruck - Stundenwerte" Value="52" Id="%ENID%" op:headerName="LuftdruckHour" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - Aktuell" Value="64" Id="%ENID%" op:headerName="Windgeschwindigkeit10MCur" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - 15-Minuten-Werte" Value="65" Id="%ENID%" op:headerName="Windgeschwindigkeit10MQ15" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - Stundenwerte" Value="66" Id="%ENID%" op:headerName="Windgeschwindigkeit10MHour" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) Maximum - Tageswerte" Value="67" Id="%ENID%" op:headerName="Windgeschwindigkeit10MMaximumDay" />
-									<Enumeration Text="Windböen (10 m) - Aktuell" Value="68" Id="%ENID%" op:headerName="Windboeen10MCur" />
-									<Enumeration Text="Windböen (10 m) - 15-Minuten-Werte" Value="69" Id="%ENID%" op:headerName="Windboeen10MQ15" />
-									<Enumeration Text="Windböen (10 m) - Stundenwerte" Value="70" Id="%ENID%" op:headerName="Windboeen10MHour" />
-									<Enumeration Text="Windböen (10 m) Maximum - Tageswerte" Value="71" Id="%ENID%" op:headerName="Windboeen10MMaximumDay" />
-									<Enumeration Text="Windrichtung (10 m) - Aktuell" Value="72" Id="%ENID%" op:headerName="Windrichtung10MCur" />
-									<Enumeration Text="Windrichtung (10 m) - 15-Minuten-Werte" Value="73" Id="%ENID%" op:headerName="Windrichtung10MQ15" />
-									<Enumeration Text="Windrichtung (10 m) - Stundenwerte" Value="74" Id="%ENID%" op:headerName="Windrichtung10MHour" />
-									<Enumeration Text="Windrichtung (10 m) vorherrschend - Tageswerte" Value="75" Id="%ENID%" op:headerName="Windrichtung10MVorherrschendDay" />
-									<Enumeration Text="Niederschlag - Aktuell" Value="80" Id="%ENID%" op:headerName="NiederschlagCur" />
-									<Enumeration Text="Niederschlag - 15-Minuten-Werte" Value="81" Id="%ENID%" op:headerName="NiederschlagQ15" />
-									<Enumeration Text="Niederschlag - Stundenwerte" Value="82" Id="%ENID%" op:headerName="NiederschlagHour" />
-									<Enumeration Text="Niederschlag Summe - Tageswerte" Value="83" Id="%ENID%" op:headerName="NiederschlagSummeDay" />
-									<Enumeration Text="Regen - Aktuell" Value="84" Id="%ENID%" op:headerName="RegenCur" />
-									<Enumeration Text="Regen - 15-Minuten-Werte" Value="85" Id="%ENID%" op:headerName="RegenQ15" />
-									<Enumeration Text="Regen - Stundenwerte" Value="86" Id="%ENID%" op:headerName="RegenHour" />
-									<Enumeration Text="Regen Summe - Tageswerte" Value="87" Id="%ENID%" op:headerName="RegenSummeDay" />
-									<Enumeration Text="Schneefall - Aktuell" Value="88" Id="%ENID%" op:headerName="SchneefallCur" />
-									<Enumeration Text="Schneefall - 15-Minuten-Werte" Value="89" Id="%ENID%" op:headerName="SchneefallQ15" />
-									<Enumeration Text="Schneefall - Stundenwerte" Value="90" Id="%ENID%" op:headerName="SchneefallHour" />
-									<Enumeration Text="Schneefall Summe - Tageswerte" Value="91" Id="%ENID%" op:headerName="SchneefallSummeDay" />
-									<Enumeration Text="Niederschlagswahrscheinlichkeit - Stundenwerte" Value="92" Id="%ENID%" op:headerName="NiederschlagswahrscheinlichkeitHour" />
-									<Enumeration Text="Niederschlagswahrscheinlichkeit Maximum - Tageswerte" Value="93" Id="%ENID%" op:headerName="NiederschlagswahrscheinlichkeitMaximumDay" />
-									<Enumeration Text="Bewölkung - Aktuell" Value="96" Id="%ENID%" op:headerName="BewoelkungCur" />
-									<Enumeration Text="Bewölkung - Stundenwerte" Value="97" Id="%ENID%" op:headerName="BewoelkungHour" />
-									<Enumeration Text="Sonnenscheindauer - Stundenwerte" Value="98" Id="%ENID%" op:headerName="SonnenscheindauerHour" />
-									<Enumeration Text="Sonnenscheindauer - Tageswerte" Value="99" Id="%ENID%" op:headerName="SonnenscheindauerDay" />
-									<Enumeration Text="Tageslichtdauer - Tageswerte" Value="100" Id="%ENID%" op:headerName="TageslichtdauerDay" />
-									<Enumeration Text="Sonnenaufgang - Tageswerte" Value="101" Id="%ENID%" op:headerName="SonnenaufgangDay" />
-									<Enumeration Text="Sonnenuntergang - Tageswerte" Value="102" Id="%ENID%" op:headerName="SonnenuntergangDay" />
-									<Enumeration Text="Globalstrahlung - 15-Minuten-Werte" Value="112" Id="%ENID%" op:headerName="GlobalstrahlungQ15" />
-									<Enumeration Text="Globalstrahlung - Stundenwerte" Value="113" Id="%ENID%" op:headerName="GlobalstrahlungHour" />
-									<Enumeration Text="Direktstrahlung - 15-Minuten-Werte" Value="114" Id="%ENID%" op:headerName="DirektstrahlungQ15" />
-									<Enumeration Text="Direktstrahlung - Stundenwerte" Value="115" Id="%ENID%" op:headerName="DirektstrahlungHour" />
-									<Enumeration Text="Diffusstrahlung - 15-Minuten-Werte" Value="116" Id="%ENID%" op:headerName="DiffusstrahlungQ15" />
-									<Enumeration Text="Diffusstrahlung - Stundenwerte" Value="117" Id="%ENID%" op:headerName="DiffusstrahlungHour" />
-									<Enumeration Text="Direktnormalstrahlung - 15-Minuten-Werte" Value="118" Id="%ENID%" op:headerName="DirektnormalstrahlungQ15" />
-									<Enumeration Text="Direktnormalstrahlung - Stundenwerte" Value="119" Id="%ENID%" op:headerName="DirektnormalstrahlungHour" />
-									<Enumeration Text="UV-Index - Aktuell" Value="120" Id="%ENID%" op:headerName="UVIndexCur" />
-									<Enumeration Text="UV-Index - Stundenwerte" Value="121" Id="%ENID%" op:headerName="UVIndexHour" />
-									<Enumeration Text="UV-Index Maximum - Tageswerte" Value="122" Id="%ENID%" op:headerName="UVIndexMaximumDay" />
-									<Enumeration Text="ET0 Referenz-Verdunstung - Stundenwerte" Value="128" Id="%ENID%" op:headerName="ET0ReferenzVerdunstungHour" />
-									<Enumeration Text="ET0 Referenz-Verdunstung Summe - Tageswerte" Value="129" Id="%ENID%" op:headerName="ET0ReferenzVerdunstungSummeDay" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" op:headerName="None" />
+									<Enumeration Text="OpenKNX Wetter-Text - Tageswerte" Value="1" Id="%ENID%" op:headerName="OpenKNXWetterTextDay" />
+									<Enumeration Text="Wettercode (WMO) - Aktuell" Value="2" Id="%ENID%" op:headerName="WettercodeWMOCur" />
+									<Enumeration Text="Wettercode (WMO) - Stundenwerte" Value="3" Id="%ENID%" op:headerName="WettercodeWMOHour" />
+									<Enumeration Text="Wettercode (WMO) - Tageswerte" Value="4" Id="%ENID%" op:headerName="WettercodeWMODay" />
+									<Enumeration Text="Wetterzustand (Code) - Aktuell" Value="5" Id="%ENID%" op:headerName="WetterzustandCodeCur" />
+									<Enumeration Text="Wetterzustand (Code) - Stundenwerte" Value="6" Id="%ENID%" op:headerName="WetterzustandCodeHour" />
+									<Enumeration Text="Wetterzustand (Code) - Tageswerte" Value="7" Id="%ENID%" op:headerName="WetterzustandCodeDay" />
+									<Enumeration Text="Temperatur (2 m) - Aktuell" Value="10" Id="%ENID%" op:headerName="Temperatur2MCur" />
+									<Enumeration Text="Temperatur (2 m) - 15-Minuten-Werte" Value="11" Id="%ENID%" op:headerName="Temperatur2MQ15" />
+									<Enumeration Text="Temperatur (2 m) - Stundenwerte" Value="12" Id="%ENID%" op:headerName="Temperatur2MHour" />
+									<Enumeration Text="Temperatur Maximum - Tageswerte" Value="13" Id="%ENID%" op:headerName="TemperaturMaximumDay" />
+									<Enumeration Text="Temperatur Minimum - Tageswerte" Value="14" Id="%ENID%" op:headerName="TemperaturMinimumDay" />
+									<Enumeration Text="Temperatur Mittel - Tageswerte" Value="15" Id="%ENID%" op:headerName="TemperaturMittelDay" />
+									<Enumeration Text="Temperatur Morgen - Tageswerte" Value="16" Id="%ENID%" op:headerName="TemperaturMorgenDay" />
+									<Enumeration Text="Temperatur Tag - Tageswerte" Value="17" Id="%ENID%" op:headerName="TemperaturTagDay" />
+									<Enumeration Text="Temperatur Abend - Tageswerte" Value="18" Id="%ENID%" op:headerName="TemperaturAbendDay" />
+									<Enumeration Text="Temperatur Nacht - Tageswerte" Value="19" Id="%ENID%" op:headerName="TemperaturNachtDay" />
+									<Enumeration Text="Gefühlte Temperatur - Aktuell" Value="20" Id="%ENID%" op:headerName="GefuehlteTemperaturCur" />
+									<Enumeration Text="Gefühlte Temperatur - 15-Minuten-Werte" Value="21" Id="%ENID%" op:headerName="GefuehlteTemperaturQ15" />
+									<Enumeration Text="Gefühlte Temperatur - Stundenwerte" Value="22" Id="%ENID%" op:headerName="GefuehlteTemperaturHour" />
+									<Enumeration Text="Gefühlte Temperatur Maximum - Tageswerte" Value="23" Id="%ENID%" op:headerName="GefuehlteTemperaturMaximumDay" />
+									<Enumeration Text="Gefühlte Temperatur Minimum - Tageswerte" Value="24" Id="%ENID%" op:headerName="GefuehlteTemperaturMinimumDay" />
+									<Enumeration Text="Gefühlte Temperatur Mittel - Tageswerte" Value="25" Id="%ENID%" op:headerName="GefuehlteTemperaturMittelDay" />
+									<Enumeration Text="Gefühlte Temperatur Morgen - Tageswerte" Value="26" Id="%ENID%" op:headerName="GefuehlteTemperaturMorgenDay" />
+									<Enumeration Text="Gefühlte Temperatur Tag - Tageswerte" Value="27" Id="%ENID%" op:headerName="GefuehlteTemperaturTagDay" />
+									<Enumeration Text="Gefühlte Temperatur Abend - Tageswerte" Value="28" Id="%ENID%" op:headerName="GefuehlteTemperaturAbendDay" />
+									<Enumeration Text="Gefühlte Temperatur Nacht - Tageswerte" Value="29" Id="%ENID%" op:headerName="GefuehlteTemperaturNachtDay" />
+									<Enumeration Text="Taupunkt - Aktuell" Value="30" Id="%ENID%" op:headerName="TaupunktCur" />
+									<Enumeration Text="Taupunkt - Stundenwerte" Value="31" Id="%ENID%" op:headerName="TaupunktHour" />
+									<Enumeration Text="Taupunkt - Tageswerte" Value="32" Id="%ENID%" op:headerName="TaupunktDay" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="40" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MCur" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - 15-Minuten-Werte" Value="41" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MQ15" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="42" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MHour" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Tageswerte" Value="43" Id="%ENID%" op:headerName="RelativeLuftfeuchte2MDay" />
+									<Enumeration Text="Luftdruck - Aktuell" Value="44" Id="%ENID%" op:headerName="LuftdruckCur" />
+									<Enumeration Text="Luftdruck - Stundenwerte" Value="45" Id="%ENID%" op:headerName="LuftdruckHour" />
+									<Enumeration Text="Luftdruck - Tageswerte" Value="46" Id="%ENID%" op:headerName="LuftdruckDay" />
+									<Enumeration Text="Sichtweite - Aktuell" Value="47" Id="%ENID%" op:headerName="SichtweiteCur" />
+									<Enumeration Text="Sichtweite - Stundenwerte" Value="48" Id="%ENID%" op:headerName="SichtweiteHour" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Aktuell" Value="50" Id="%ENID%" op:headerName="Windgeschwindigkeit10MCur" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - 15-Minuten-Werte" Value="51" Id="%ENID%" op:headerName="Windgeschwindigkeit10MQ15" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Stundenwerte" Value="52" Id="%ENID%" op:headerName="Windgeschwindigkeit10MHour" />
+									<Enumeration Text="Windgeschwindigkeit Maximum - Tageswerte" Value="53" Id="%ENID%" op:headerName="WindgeschwindigkeitMaximumDay" />
+									<Enumeration Text="Windböen (10 m) - Aktuell" Value="54" Id="%ENID%" op:headerName="Windboeen10MCur" />
+									<Enumeration Text="Windböen (10 m) - 15-Minuten-Werte" Value="55" Id="%ENID%" op:headerName="Windboeen10MQ15" />
+									<Enumeration Text="Windböen (10 m) - Stundenwerte" Value="56" Id="%ENID%" op:headerName="Windboeen10MHour" />
+									<Enumeration Text="Windböen Maximum - Tageswerte" Value="57" Id="%ENID%" op:headerName="WindboeenMaximumDay" />
+									<Enumeration Text="Windrichtung (10 m) - Aktuell" Value="58" Id="%ENID%" op:headerName="Windrichtung10MCur" />
+									<Enumeration Text="Windrichtung (10 m) - 15-Minuten-Werte" Value="59" Id="%ENID%" op:headerName="Windrichtung10MQ15" />
+									<Enumeration Text="Windrichtung (10 m) - Stundenwerte" Value="60" Id="%ENID%" op:headerName="Windrichtung10MHour" />
+									<Enumeration Text="Windrichtung vorherrschend - Tageswerte" Value="61" Id="%ENID%" op:headerName="WindrichtungVorherrschendDay" />
+									<Enumeration Text="Niederschlag - Aktuell" Value="70" Id="%ENID%" op:headerName="NiederschlagCur" />
+									<Enumeration Text="Niederschlag - 15-Minuten-Werte" Value="71" Id="%ENID%" op:headerName="NiederschlagQ15" />
+									<Enumeration Text="Niederschlag - Stundenwerte" Value="72" Id="%ENID%" op:headerName="NiederschlagHour" />
+									<Enumeration Text="Niederschlag Summe - Tageswerte" Value="73" Id="%ENID%" op:headerName="NiederschlagSummeDay" />
+									<Enumeration Text="Regen - Aktuell" Value="74" Id="%ENID%" op:headerName="RegenCur" />
+									<Enumeration Text="Regen - 15-Minuten-Werte" Value="75" Id="%ENID%" op:headerName="RegenQ15" />
+									<Enumeration Text="Regen - Stundenwerte" Value="76" Id="%ENID%" op:headerName="RegenHour" />
+									<Enumeration Text="Regen Summe - Tageswerte" Value="77" Id="%ENID%" op:headerName="RegenSummeDay" />
+									<Enumeration Text="Schneefall - Aktuell" Value="78" Id="%ENID%" op:headerName="SchneefallCur" />
+									<Enumeration Text="Schneefall - 15-Minuten-Werte" Value="79" Id="%ENID%" op:headerName="SchneefallQ15" />
+									<Enumeration Text="Schneefall - Stundenwerte" Value="80" Id="%ENID%" op:headerName="SchneefallHour" />
+									<Enumeration Text="Schneefall Summe - Tageswerte" Value="81" Id="%ENID%" op:headerName="SchneefallSummeDay" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit - Stundenwerte" Value="82" Id="%ENID%" op:headerName="NiederschlagswahrscheinlichkeitHour" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit Maximum - Tageswerte" Value="83" Id="%ENID%" op:headerName="NiederschlagswahrscheinlichkeitMaximumDay" />
+									<Enumeration Text="Bewölkung - Aktuell" Value="90" Id="%ENID%" op:headerName="BewoelkungCur" />
+									<Enumeration Text="Bewölkung - Stundenwerte" Value="91" Id="%ENID%" op:headerName="BewoelkungHour" />
+									<Enumeration Text="Bewölkung - Tageswerte" Value="92" Id="%ENID%" op:headerName="BewoelkungDay" />
+									<Enumeration Text="Sonnenscheindauer - Stundenwerte" Value="93" Id="%ENID%" op:headerName="SonnenscheindauerHour" />
+									<Enumeration Text="Sonnenscheindauer - Tageswerte" Value="94" Id="%ENID%" op:headerName="SonnenscheindauerDay" />
+									<Enumeration Text="Tageslichtdauer - Tageswerte" Value="95" Id="%ENID%" op:headerName="TageslichtdauerDay" />
+									<Enumeration Text="Sonnenaufgang - Tageswerte" Value="96" Id="%ENID%" op:headerName="SonnenaufgangDay" />
+									<Enumeration Text="Sonnenuntergang - Tageswerte" Value="97" Id="%ENID%" op:headerName="SonnenuntergangDay" />
+									<Enumeration Text="Globalstrahlung - 15-Minuten-Werte" Value="110" Id="%ENID%" op:headerName="GlobalstrahlungQ15" />
+									<Enumeration Text="Globalstrahlung - Stundenwerte" Value="111" Id="%ENID%" op:headerName="GlobalstrahlungHour" />
+									<Enumeration Text="Direktstrahlung - 15-Minuten-Werte" Value="112" Id="%ENID%" op:headerName="DirektstrahlungQ15" />
+									<Enumeration Text="Direktstrahlung - Stundenwerte" Value="113" Id="%ENID%" op:headerName="DirektstrahlungHour" />
+									<Enumeration Text="Diffusstrahlung - 15-Minuten-Werte" Value="114" Id="%ENID%" op:headerName="DiffusstrahlungQ15" />
+									<Enumeration Text="Diffusstrahlung - Stundenwerte" Value="115" Id="%ENID%" op:headerName="DiffusstrahlungHour" />
+									<Enumeration Text="Direktnormalstrahlung - 15-Minuten-Werte" Value="116" Id="%ENID%" op:headerName="DirektnormalstrahlungQ15" />
+									<Enumeration Text="Direktnormalstrahlung - Stundenwerte" Value="117" Id="%ENID%" op:headerName="DirektnormalstrahlungHour" />
+									<Enumeration Text="UV-Index - Aktuell" Value="118" Id="%ENID%" op:headerName="UVIndexCur" />
+									<Enumeration Text="UV-Index - Stundenwerte" Value="119" Id="%ENID%" op:headerName="UVIndexHour" />
+									<Enumeration Text="UV-Index Maximum - Tageswerte" Value="120" Id="%ENID%" op:headerName="UVIndexMaximumDay" />
+									<Enumeration Text="ET0 Referenz-Verdunstung - Stundenwerte" Value="130" Id="%ENID%" op:headerName="ET0ReferenzVerdunstungHour" />
+									<Enumeration Text="ET0 Referenz-Verdunstung Summe - Tageswerte" Value="131" Id="%ENID%" op:headerName="ET0ReferenzVerdunstungSummeDay" />
 								</TypeRestriction>
 							</ParameterType>
 
-							<ParameterType Id="%AID%_PT-IWMeasurandUebersicht" Name="IWMeasurandUebersicht" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapUebersicht" Name="IWMeasurandOpenweathermapUebersicht" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="OpenKNX Wetter-Text - Tageswerte" Value="16" Id="%ENID%" />
-									<Enumeration Text="Wettercode (WMO) - Aktuell" Value="17" Id="%ENID%" />
-									<Enumeration Text="Wettercode (WMO) - Stundenwerte" Value="18" Id="%ENID%" />
-									<Enumeration Text="Wettercode (WMO) - Tageswerte" Value="19" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="OpenKNX Wetter-Text - Tageswerte" Value="1" Id="%ENID%" />
+									<Enumeration Text="Wetterzustand (Code) - Aktuell" Value="5" Id="%ENID%" />
+									<Enumeration Text="Wetterzustand (Code) - Stundenwerte" Value="6" Id="%ENID%" />
+									<Enumeration Text="Wetterzustand (Code) - Tageswerte" Value="7" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandTemperatur" Name="IWMeasurandTemperatur" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapTemperatur" Name="IWMeasurandOpenweathermapTemperatur" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) - Aktuell" Value="32" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) - 15-Minuten-Werte" Value="33" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) - Stundenwerte" Value="34" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) Maximum - Tageswerte" Value="35" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) Minimum - Tageswerte" Value="36" Id="%ENID%" />
-									<Enumeration Text="Temperatur (2 m) Mittel - Tageswerte" Value="37" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur - Aktuell" Value="38" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur - 15-Minuten-Werte" Value="39" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur - Stundenwerte" Value="40" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur Maximum - Tageswerte" Value="41" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur Minimum - Tageswerte" Value="42" Id="%ENID%" />
-									<Enumeration Text="Gefühlte Temperatur Mittel - Tageswerte" Value="43" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Temperatur (2 m) - Aktuell" Value="10" Id="%ENID%" />
+									<Enumeration Text="Temperatur (2 m) - Stundenwerte" Value="12" Id="%ENID%" />
+									<Enumeration Text="Temperatur Maximum - Tageswerte" Value="13" Id="%ENID%" />
+									<Enumeration Text="Temperatur Minimum - Tageswerte" Value="14" Id="%ENID%" />
+									<Enumeration Text="Temperatur Morgen - Tageswerte" Value="16" Id="%ENID%" />
+									<Enumeration Text="Temperatur Tag - Tageswerte" Value="17" Id="%ENID%" />
+									<Enumeration Text="Temperatur Abend - Tageswerte" Value="18" Id="%ENID%" />
+									<Enumeration Text="Temperatur Nacht - Tageswerte" Value="19" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur - Aktuell" Value="20" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur - Stundenwerte" Value="22" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Morgen - Tageswerte" Value="26" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Tag - Tageswerte" Value="27" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Abend - Tageswerte" Value="28" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Nacht - Tageswerte" Value="29" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Aktuell" Value="30" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Stundenwerte" Value="31" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Tageswerte" Value="32" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandFeuchteDruck" Name="IWMeasurandFeuchteDruck" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapFeuchteDruck" Name="IWMeasurandOpenweathermapFeuchteDruck" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="48" Id="%ENID%" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - 15-Minuten-Werte" Value="49" Id="%ENID%" />
-									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="50" Id="%ENID%" />
-									<Enumeration Text="Luftdruck - Aktuell" Value="51" Id="%ENID%" />
-									<Enumeration Text="Luftdruck - Stundenwerte" Value="52" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="40" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="42" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Tageswerte" Value="43" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Aktuell" Value="44" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Stundenwerte" Value="45" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Tageswerte" Value="46" Id="%ENID%" />
+									<Enumeration Text="Sichtweite - Aktuell" Value="47" Id="%ENID%" />
+									<Enumeration Text="Sichtweite - Stundenwerte" Value="48" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandWind" Name="IWMeasurandWind" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapWind" Name="IWMeasurandOpenweathermapWind" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - Aktuell" Value="64" Id="%ENID%" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - 15-Minuten-Werte" Value="65" Id="%ENID%" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) - Stundenwerte" Value="66" Id="%ENID%" />
-									<Enumeration Text="Windgeschwindigkeit (10 m) Maximum - Tageswerte" Value="67" Id="%ENID%" />
-									<Enumeration Text="Windböen (10 m) - Aktuell" Value="68" Id="%ENID%" />
-									<Enumeration Text="Windböen (10 m) - 15-Minuten-Werte" Value="69" Id="%ENID%" />
-									<Enumeration Text="Windböen (10 m) - Stundenwerte" Value="70" Id="%ENID%" />
-									<Enumeration Text="Windböen (10 m) Maximum - Tageswerte" Value="71" Id="%ENID%" />
-									<Enumeration Text="Windrichtung (10 m) - Aktuell" Value="72" Id="%ENID%" />
-									<Enumeration Text="Windrichtung (10 m) - 15-Minuten-Werte" Value="73" Id="%ENID%" />
-									<Enumeration Text="Windrichtung (10 m) - Stundenwerte" Value="74" Id="%ENID%" />
-									<Enumeration Text="Windrichtung (10 m) vorherrschend - Tageswerte" Value="75" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Aktuell" Value="50" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Stundenwerte" Value="52" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit Maximum - Tageswerte" Value="53" Id="%ENID%" />
+									<Enumeration Text="Windböen (10 m) - Aktuell" Value="54" Id="%ENID%" />
+									<Enumeration Text="Windböen (10 m) - Stundenwerte" Value="56" Id="%ENID%" />
+									<Enumeration Text="Windböen Maximum - Tageswerte" Value="57" Id="%ENID%" />
+									<Enumeration Text="Windrichtung (10 m) - Aktuell" Value="58" Id="%ENID%" />
+									<Enumeration Text="Windrichtung (10 m) - Stundenwerte" Value="60" Id="%ENID%" />
+									<Enumeration Text="Windrichtung vorherrschend - Tageswerte" Value="61" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandNiederschlag" Name="IWMeasurandNiederschlag" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapNiederschlag" Name="IWMeasurandOpenweathermapNiederschlag" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Niederschlag - Aktuell" Value="80" Id="%ENID%" />
-									<Enumeration Text="Niederschlag - 15-Minuten-Werte" Value="81" Id="%ENID%" />
-									<Enumeration Text="Niederschlag - Stundenwerte" Value="82" Id="%ENID%" />
-									<Enumeration Text="Niederschlag Summe - Tageswerte" Value="83" Id="%ENID%" />
-									<Enumeration Text="Regen - Aktuell" Value="84" Id="%ENID%" />
-									<Enumeration Text="Regen - 15-Minuten-Werte" Value="85" Id="%ENID%" />
-									<Enumeration Text="Regen - Stundenwerte" Value="86" Id="%ENID%" />
-									<Enumeration Text="Regen Summe - Tageswerte" Value="87" Id="%ENID%" />
-									<Enumeration Text="Schneefall - Aktuell" Value="88" Id="%ENID%" />
-									<Enumeration Text="Schneefall - 15-Minuten-Werte" Value="89" Id="%ENID%" />
-									<Enumeration Text="Schneefall - Stundenwerte" Value="90" Id="%ENID%" />
-									<Enumeration Text="Schneefall Summe - Tageswerte" Value="91" Id="%ENID%" />
-									<Enumeration Text="Niederschlagswahrscheinlichkeit - Stundenwerte" Value="92" Id="%ENID%" />
-									<Enumeration Text="Niederschlagswahrscheinlichkeit Maximum - Tageswerte" Value="93" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Regen - Aktuell" Value="74" Id="%ENID%" />
+									<Enumeration Text="Regen - Stundenwerte" Value="76" Id="%ENID%" />
+									<Enumeration Text="Regen Summe - Tageswerte" Value="77" Id="%ENID%" />
+									<Enumeration Text="Schneefall - Aktuell" Value="78" Id="%ENID%" />
+									<Enumeration Text="Schneefall - Stundenwerte" Value="80" Id="%ENID%" />
+									<Enumeration Text="Schneefall Summe - Tageswerte" Value="81" Id="%ENID%" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit - Stundenwerte" Value="82" Id="%ENID%" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit Maximum - Tageswerte" Value="83" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandBewoelkungSonne" Name="IWMeasurandBewoelkungSonne" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapBewoelkungSonne" Name="IWMeasurandOpenweathermapBewoelkungSonne" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Bewölkung - Aktuell" Value="96" Id="%ENID%" />
-									<Enumeration Text="Bewölkung - Stundenwerte" Value="97" Id="%ENID%" />
-									<Enumeration Text="Sonnenscheindauer - Stundenwerte" Value="98" Id="%ENID%" />
-									<Enumeration Text="Sonnenscheindauer - Tageswerte" Value="99" Id="%ENID%" />
-									<Enumeration Text="Tageslichtdauer - Tageswerte" Value="100" Id="%ENID%" />
-									<Enumeration Text="Sonnenaufgang - Tageswerte" Value="101" Id="%ENID%" />
-									<Enumeration Text="Sonnenuntergang - Tageswerte" Value="102" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Aktuell" Value="90" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Stundenwerte" Value="91" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Tageswerte" Value="92" Id="%ENID%" />
+									<Enumeration Text="Sonnenaufgang - Tageswerte" Value="96" Id="%ENID%" />
+									<Enumeration Text="Sonnenuntergang - Tageswerte" Value="97" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandStrahlung" Name="IWMeasurandStrahlung" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenweathermapStrahlung" Name="IWMeasurandOpenweathermapStrahlung" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="Globalstrahlung - 15-Minuten-Werte" Value="112" Id="%ENID%" />
-									<Enumeration Text="Globalstrahlung - Stundenwerte" Value="113" Id="%ENID%" />
-									<Enumeration Text="Direktstrahlung - 15-Minuten-Werte" Value="114" Id="%ENID%" />
-									<Enumeration Text="Direktstrahlung - Stundenwerte" Value="115" Id="%ENID%" />
-									<Enumeration Text="Diffusstrahlung - 15-Minuten-Werte" Value="116" Id="%ENID%" />
-									<Enumeration Text="Diffusstrahlung - Stundenwerte" Value="117" Id="%ENID%" />
-									<Enumeration Text="Direktnormalstrahlung - 15-Minuten-Werte" Value="118" Id="%ENID%" />
-									<Enumeration Text="Direktnormalstrahlung - Stundenwerte" Value="119" Id="%ENID%" />
-									<Enumeration Text="UV-Index - Aktuell" Value="120" Id="%ENID%" />
-									<Enumeration Text="UV-Index - Stundenwerte" Value="121" Id="%ENID%" />
-									<Enumeration Text="UV-Index Maximum - Tageswerte" Value="122" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="UV-Index - Aktuell" Value="118" Id="%ENID%" />
+									<Enumeration Text="UV-Index - Stundenwerte" Value="119" Id="%ENID%" />
+									<Enumeration Text="UV-Index Maximum - Tageswerte" Value="120" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWMeasurandLandwirtschaft" Name="IWMeasurandLandwirtschaft" op:headerExport="base" op:headerName="Measurand">
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoUebersicht" Name="IWMeasurandOpenmeteoUebersicht" op:headerExport="base" op:headerName="Measurand">
 								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
-									<Enumeration Text="Bitte waehlen..." Value="0" Id="%ENID%" />
-									<Enumeration Text="ET0 Referenz-Verdunstung - Stundenwerte" Value="128" Id="%ENID%" />
-									<Enumeration Text="ET0 Referenz-Verdunstung Summe - Tageswerte" Value="129" Id="%ENID%" />
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="OpenKNX Wetter-Text - Tageswerte" Value="1" Id="%ENID%" />
+									<Enumeration Text="Wettercode (WMO) - Aktuell" Value="2" Id="%ENID%" />
+									<Enumeration Text="Wettercode (WMO) - Stundenwerte" Value="3" Id="%ENID%" />
+									<Enumeration Text="Wettercode (WMO) - Tageswerte" Value="4" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoTemperatur" Name="IWMeasurandOpenmeteoTemperatur" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Temperatur (2 m) - Aktuell" Value="10" Id="%ENID%" />
+									<Enumeration Text="Temperatur (2 m) - 15-Minuten-Werte" Value="11" Id="%ENID%" />
+									<Enumeration Text="Temperatur (2 m) - Stundenwerte" Value="12" Id="%ENID%" />
+									<Enumeration Text="Temperatur Maximum - Tageswerte" Value="13" Id="%ENID%" />
+									<Enumeration Text="Temperatur Minimum - Tageswerte" Value="14" Id="%ENID%" />
+									<Enumeration Text="Temperatur Mittel - Tageswerte" Value="15" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur - Aktuell" Value="20" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur - 15-Minuten-Werte" Value="21" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur - Stundenwerte" Value="22" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Maximum - Tageswerte" Value="23" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Minimum - Tageswerte" Value="24" Id="%ENID%" />
+									<Enumeration Text="Gefühlte Temperatur Mittel - Tageswerte" Value="25" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Aktuell" Value="30" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Stundenwerte" Value="31" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoFeuchteDruck" Name="IWMeasurandOpenmeteoFeuchteDruck" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="40" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - 15-Minuten-Werte" Value="41" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="42" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Aktuell" Value="44" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Stundenwerte" Value="45" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoWind" Name="IWMeasurandOpenmeteoWind" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Aktuell" Value="50" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - 15-Minuten-Werte" Value="51" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit (10 m) - Stundenwerte" Value="52" Id="%ENID%" />
+									<Enumeration Text="Windgeschwindigkeit Maximum - Tageswerte" Value="53" Id="%ENID%" />
+									<Enumeration Text="Windböen (10 m) - Aktuell" Value="54" Id="%ENID%" />
+									<Enumeration Text="Windböen (10 m) - 15-Minuten-Werte" Value="55" Id="%ENID%" />
+									<Enumeration Text="Windböen (10 m) - Stundenwerte" Value="56" Id="%ENID%" />
+									<Enumeration Text="Windböen Maximum - Tageswerte" Value="57" Id="%ENID%" />
+									<Enumeration Text="Windrichtung (10 m) - Aktuell" Value="58" Id="%ENID%" />
+									<Enumeration Text="Windrichtung (10 m) - 15-Minuten-Werte" Value="59" Id="%ENID%" />
+									<Enumeration Text="Windrichtung (10 m) - Stundenwerte" Value="60" Id="%ENID%" />
+									<Enumeration Text="Windrichtung vorherrschend - Tageswerte" Value="61" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoNiederschlag" Name="IWMeasurandOpenmeteoNiederschlag" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Niederschlag - Aktuell" Value="70" Id="%ENID%" />
+									<Enumeration Text="Niederschlag - 15-Minuten-Werte" Value="71" Id="%ENID%" />
+									<Enumeration Text="Niederschlag - Stundenwerte" Value="72" Id="%ENID%" />
+									<Enumeration Text="Niederschlag Summe - Tageswerte" Value="73" Id="%ENID%" />
+									<Enumeration Text="Regen - Aktuell" Value="74" Id="%ENID%" />
+									<Enumeration Text="Regen - 15-Minuten-Werte" Value="75" Id="%ENID%" />
+									<Enumeration Text="Regen - Stundenwerte" Value="76" Id="%ENID%" />
+									<Enumeration Text="Regen Summe - Tageswerte" Value="77" Id="%ENID%" />
+									<Enumeration Text="Schneefall - Aktuell" Value="78" Id="%ENID%" />
+									<Enumeration Text="Schneefall - 15-Minuten-Werte" Value="79" Id="%ENID%" />
+									<Enumeration Text="Schneefall - Stundenwerte" Value="80" Id="%ENID%" />
+									<Enumeration Text="Schneefall Summe - Tageswerte" Value="81" Id="%ENID%" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit - Stundenwerte" Value="82" Id="%ENID%" />
+									<Enumeration Text="Niederschlagswahrscheinlichkeit Maximum - Tageswerte" Value="83" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoBewoelkungSonne" Name="IWMeasurandOpenmeteoBewoelkungSonne" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Aktuell" Value="90" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Stundenwerte" Value="91" Id="%ENID%" />
+									<Enumeration Text="Sonnenscheindauer - Stundenwerte" Value="93" Id="%ENID%" />
+									<Enumeration Text="Sonnenscheindauer - Tageswerte" Value="94" Id="%ENID%" />
+									<Enumeration Text="Tageslichtdauer - Tageswerte" Value="95" Id="%ENID%" />
+									<Enumeration Text="Sonnenaufgang - Tageswerte" Value="96" Id="%ENID%" />
+									<Enumeration Text="Sonnenuntergang - Tageswerte" Value="97" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoStrahlung" Name="IWMeasurandOpenmeteoStrahlung" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="Globalstrahlung - 15-Minuten-Werte" Value="110" Id="%ENID%" />
+									<Enumeration Text="Globalstrahlung - Stundenwerte" Value="111" Id="%ENID%" />
+									<Enumeration Text="Direktstrahlung - 15-Minuten-Werte" Value="112" Id="%ENID%" />
+									<Enumeration Text="Direktstrahlung - Stundenwerte" Value="113" Id="%ENID%" />
+									<Enumeration Text="Diffusstrahlung - 15-Minuten-Werte" Value="114" Id="%ENID%" />
+									<Enumeration Text="Diffusstrahlung - Stundenwerte" Value="115" Id="%ENID%" />
+									<Enumeration Text="Direktnormalstrahlung - 15-Minuten-Werte" Value="116" Id="%ENID%" />
+									<Enumeration Text="Direktnormalstrahlung - Stundenwerte" Value="117" Id="%ENID%" />
+									<Enumeration Text="UV-Index - Aktuell" Value="118" Id="%ENID%" />
+									<Enumeration Text="UV-Index - Stundenwerte" Value="119" Id="%ENID%" />
+									<Enumeration Text="UV-Index Maximum - Tageswerte" Value="120" Id="%ENID%" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoLandwirtschaft" Name="IWMeasurandOpenmeteoLandwirtschaft" op:headerExport="base" op:headerName="Measurand">
+								<TypeRestriction Base="Value" SizeInBit="8" UIHint="DropDown">
+									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
+									<Enumeration Text="ET0 Referenz-Verdunstung - Stundenwerte" Value="130" Id="%ENID%" />
+									<Enumeration Text="ET0 Referenz-Verdunstung Summe - Tageswerte" Value="131" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
 
@@ -274,19 +402,25 @@
 
 							<ParameterType Id="%AID%_PT-IWSendBehaviour" Name="IWSendBehaviour" op:headerExport="enum" op:headerName="SendBehaviour">
 								<TypeRestriction Base="Value" SizeInBit="1">
-									<Enumeration Text="Nur bei Aenderung" Value="0" Id="%ENID%" op:headerName="OnChange" />
+									<Enumeration Text="Nur bei Änderung" Value="0" Id="%ENID%" op:headerName="OnChange" />
 									<Enumeration Text="Bei jedem Abruf" Value="1" Id="%ENID%" op:headerName="Always" />
 								</TypeRestriction>
 							</ParameterType>
 
-							<ParameterType Id="%AID%_PT-IWOffsetQ15" Name="IWOffsetQ15">
+							<ParameterType Id="%AID%_PT-IWOffsetOpenweathermapHour" Name="IWOffsetOpenweathermapHour">
+								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="0" maxInclusive="47" />
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWOffsetOpenweathermapDay" Name="IWOffsetOpenweathermapDay">
+								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="0" maxInclusive="7" />
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWOffsetOpenmeteoQ15" Name="IWOffsetOpenmeteoQ15">
 								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="-192" maxInclusive="671" />
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWOffsetHour" Name="IWOffsetHour">
+							<ParameterType Id="%AID%_PT-IWOffsetOpenmeteoHour" Name="IWOffsetOpenmeteoHour">
 								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="-48" maxInclusive="167" />
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-IWOffsetDay" Name="IWOffsetDay">
-								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="-2" maxInclusive="6" />
+							<ParameterType Id="%AID%_PT-IWOffsetOpenmeteoDay" Name="IWOffsetOpenmeteoDay">
+								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="-2" maxInclusive="15" />
 							</ParameterType>
 							<!-- END GENERATED CATALOG -->
 
@@ -294,9 +428,16 @@
 						<Parameters>
 							<!-- Base Settings -->
 
+							<!-- OpenWeatherMap API Key -->
+							<Union SizeInBit="328">
+								<Memory CodeSegment="%MID%" Offset="1" BitOffset="0" />
+								<Parameter Id="%AID%_UP-%TT%00001" Name="OpenWeatherMap_APIKey" ParameterType="%AID%_PT-APIKEY" Offset="0" BitOffset="0" Text="API Key" Value="" />
+								<!-- 1Byte Empty Byte after String -->
+							</Union>
+
 							<!-- Open-Meteo -->
 							<Union SizeInBit="984">
-								<Memory CodeSegment="%MID%" Offset="1" BitOffset="0" />
+								<Memory CodeSegment="%MID%" Offset="42" BitOffset="0" />
 								<Parameter Id="%AID%_UP-%TT%00020" Name="OpenMeteo_UsageLicense"    ParameterType="%AID%_PT-OpenMeteoUsage" Offset="0" BitOffset="0" Text="Nutzung/Lizenz"       Value="0" />
 
 								<Parameter Id="%AID%_UP-%TT%00022" Name="OpenMeteo_ServerURL"       ParameterType="%AID%_PT-ServerUrl"      Offset="1" BitOffset="0" Text="Server-Basis-URL"      Value="" />
@@ -307,12 +448,12 @@
 
 							<!-- WeatherRefreshInterval -->
 							<Union SizeInBit="8">
-								<Memory CodeSegment="%MID%" Offset="124" BitOffset="0" />
+								<Memory CodeSegment="%MID%" Offset="165" BitOffset="0" />
 								<Parameter Id="%AID%_UP-%TT%00002" Name="WeatherRefreshInterval" ParameterType="%AID%_PT-WeatherRefreshInterval" Offset="0" BitOffset="0" Text="Automatische Aktualisierung" Value="3" />
 							</Union>
 							<!-- Weather Condition -->
 							<Union SizeInBit="512">
-								<Memory CodeSegment="%MID%" Offset="125" BitOffset="0" />
+								<Memory CodeSegment="%MID%" Offset="166" BitOffset="0" />
 								<Parameter Id="%AID%_UP-%TT%00003" Name="TextPrefixDayCurrent"  ParameterType="%AID%_PT-WeatherConditionDayPrefix" Offset="0"  BitOffset="0" Text="Aktueller Tag" Value="="            />
 								<!-- 1 byte empty after string -                                                                                   Offset="1"                                                         -->
 								<Parameter Id="%AID%_UP-%TT%00004" Name="TextPrefixDayNext"     ParameterType="%AID%_PT-WeatherConditionDayPrefix" Offset="2"  BitOffset="0" Text="Nächster Tag"  Value=">"            />
@@ -332,6 +473,8 @@
 							</Union>
 						</Parameters>
 						<ParameterRefs>
+							<!-- OpenWeatherMap API Key -->
+							<ParameterRef Id="%AID%_UP-%TT%00001_R-%TT%0000101" RefId="%AID%_UP-%TT%00001" />
 							<!-- WeatherRefreshInterval -->
 							<ParameterRef Id="%AID%_UP-%TT%00002_R-%TT%0000201" RefId="%AID%_UP-%TT%00002" />
 							<!-- WeatherConditionCurrentDayPrefix -->
@@ -369,6 +512,11 @@
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Version: %ModuleVersion%" />
 
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="" UIHint="HorizontalRuler" />
+
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="OpenWeatherMap" UIHint="Headline" />
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="One Call 3.0 erfordert ein Abonnement ('One Call by Call'). Bis 1.000 Aufrufe pro Tag sind kostenfrei.&#10;Siehe https://openweathermap.org/api/one-call-3" UIHint="Information" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00001_R-%TT%0000101" IndentLevel="1" HelpContext="IW-OpenWeatherMapAPIKey" />
+
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Open-Meteo" UIHint="Headline" />
 								<ParameterRefRef RefId="%AID%_UP-%TT%00020_R-%TT%0002001" HelpContext="IW-OpenMeteoUsage" />
 								<choose ParamRefId="%AID%_UP-%TT%00020_R-%TT%0002001">
@@ -426,12 +574,12 @@
 										<Row Id="%AID%_PB-nnn_R-1" />
 									</Rows>
 									<Columns>
-										<Column Id="%AID%_PB-nnn_C-1" Width="15%" />
+										<Column Id="%AID%_PB-nnn_C-1" Width="10%" />
 										<Column Id="%AID%_PB-nnn_C-2" Width="35%" />
-										<Column Id="%AID%_PB-nnn_C-3" Width="50%" />
+										<Column Id="%AID%_PB-nnn_C-3" Width="55%" />
 									</Columns>
 									<ParameterSeparator Id="%AID%_PS-nnn" Cell="1,1" UIHint="Headline" Text="Kanal" />
-									<ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Wetter-Kanal" />
+									<ParameterSeparator Id="%AID%_PS-nnn" Cell="1,2" UIHint="Headline" Text="Wetter-Service" />
 									<ParameterSeparator Id="%AID%_PS-nnn" Cell="1,3" UIHint="Headline" Text="Beschreibung" />
 								</ParameterBlock>
 								<op:include href="InternetWeatherModule.templ.xml" xpath="//Dynamic/ChannelIndependentBlock/ParameterBlock[@Name='Settings']/*" type="template" prefix="IW" IsInner="true" />

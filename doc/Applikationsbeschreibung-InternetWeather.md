@@ -47,6 +47,47 @@ Das Modul fragt nur die Variablen und nur den Zeitraum ab, die von den drei Slot
 
 ---
 
+<!-- DOC HelpContext="WetterService" -->
+## Wetter-Service
+
+Bestimmt, von welchem Dienst die Daten dieses Kanals kommen — und damit zugleich, welche Kategorien und Messwerte die Slots anbieten.
+
+| Wert | Bedeutung |
+|------|-----------|
+| Deaktiviert | Kanal ist inaktiv und erscheint nicht in der Baumansicht |
+| OpenWeatherMap | One Call 3.0, erfordert ein Abonnement und einen API Key |
+| Open-Meteo | Freie Nutzung unter CC BY 4.0, optional mit Abo und eigenem Server |
+
+Die Dienste unterscheiden sich im Angebot erheblich:
+
+| | Aktuell | 15-Minuten-Werte | Stundenwerte | Tageswerte |
+|---|:--:|:--:|:--:|:--:|
+| OpenWeatherMap | ✓ | — | 48 Stunden | 8 Tage |
+| Open-Meteo | ✓ | ✓ | 168 Stunden | 16 Tage |
+
+**Nur bei Open-Meteo:** 15-Minuten-Werte, Strahlungsgrößen, Sonnenscheindauer, Tageslichtdauer, ET₀ sowie Werte aus der Vergangenheit (negative Offsets).
+
+**Nur bei OpenWeatherMap:** Temperatur und gefühlte Temperatur für Morgen, Tag, Abend und Nacht als Tageswerte, sowie die Sichtweite.
+
+Ein Wechsel des Dienstes behält die Slot-Einstellungen dort, wo beide Dienste dieselbe Größe liefern. Messwerte, die der neue Dienst nicht kennt, müssen neu gewählt werden.
+
+<!-- DOCEND -->
+
+---
+
+<!-- DOC HelpContext="OpenWeatherMapAPIKey" -->
+## API Key (OpenWeatherMap)
+
+Der API Key für die One Call 3.0 API. Er wird bei jedem Abruf über den URL-Parameter `appid` übergeben.
+
+One Call 3.0 ist nur im Abonnement „One Call by Call" verfügbar; bis 1.000 Aufrufe pro Tag fallen keine Kosten an. Für das Abonnement wird eine Zahlungsmethode hinterlegt, auch wenn das Freikontingent nicht überschritten wird.
+
+Siehe https://openweathermap.org/api/one-call-3
+
+<!-- DOCEND -->
+
+---
+
 <!-- DOC HelpContext="OpenMeteoUsage" -->
 ## Nutzung/Lizenz (Open-Meteo)
 
@@ -146,7 +187,7 @@ Beispiel: `16.3731` für Wien
 
 # Wert-Slots
 
-<!-- DOC HelpContext="SlotLabel" -->
+<!-- DOC HelpContext="SlotBezeichnung" -->
 ## Bezeichnung
 
 Freitext für diesen Wert-Slot. Der Text erscheint als Name des Kommunikationsobjekts und in der Baumansicht.
