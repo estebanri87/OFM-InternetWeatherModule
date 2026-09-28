@@ -42,6 +42,10 @@
                    Auf dem Kanal-Tab wird nur der Dienst gewechselt, nie deaktiviert. -->
               <Parameter Id="%AID%_P-%TT%%CC%997" Name="Ch%C%TypeSelect" ParameterType="%AID%_PT-WeatherChannelTypeSelect" Text="Wetter-Service" Value="2" />
 
+              <!-- Anzeigename für den Kanal-Tab: Beschreibung, der bei "Suspendiert = Ja"
+                   das Zeichen der Kanalauswahl vorangestellt wird. Nur in der ETS. -->
+              <Parameter Id="%AID%_P-%TT%%CC%998" Name="Ch%C%NameDisplay" ParameterType="%AID%_PT-Text45Byte" Text="Beschreibung (Anzeige)" Value="" Access="Read" op:configTransfer="never" />
+
               <!-- Wetter A/B/C -->
               <op:usePart name="SLOT" xpath="//Parameters/*" />
             </Parameters>
@@ -54,6 +58,7 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" RefId="%AID%_UP-%TT%%CC%004" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" RefId="%AID%_UP-%TT%%CC%005" />
               <ParameterRef Id="%AID%_P-%TT%%CC%997_R-%TT%%CC%99701" RefId="%AID%_P-%TT%%CC%997" />
+              <ParameterRef Id="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" RefId="%AID%_P-%TT%%CC%998" />
 
               <op:usePart name="SLOT" xpath="//ParameterRefs/*" />
             </ParameterRefs>
@@ -69,6 +74,19 @@
                 </LParameters>
                 <RParameters>
                   <ParameterRefRef RefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" AliasName="TypeValue" />
+                </RParameters>
+              </ParameterCalculation>
+
+              <!-- Suspendierte Kanäle in der Baumansicht kennzeichnen -->
+              <ParameterCalculation Id="%AID%_PC-%TT%%CC%002" Language="JavaScript" Name="MarkInactive%CC%"
+                                    RLTransformationFunc="BASE_MarkInactiveChannel" RLTransformationParameters="{&quot;InactiveValue&quot;:1}"
+                                    LRTransformationFunc="BASE_Nop">
+                <LParameters>
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" AliasName="TextOutput" />
+                </LParameters>
+                <RParameters>
+                  <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" AliasName="TextInput" />
+                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" AliasName="InactiveControl" />
                 </RParameters>
               </ParameterCalculation>
             </ParameterCalculations>
@@ -112,7 +130,7 @@
               <ParameterBlock Id="%AID%_PB-nnn" Name="Channel">
                 <choose ParamRefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101">
                   <when test="&gt;0">
-                    <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IW" Text="Wetter %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" Icon="weather-partly-cloudy" HelpContext="IW-Service" ShowInComObjectTree="true">
+                    <ParameterBlock Id="%AID%_PB-nnn" Name="f%CC%IW" Text="Wetter %C%: {{0: ...}}" TextParameterRefId="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" Icon="weather-partly-cloudy" HelpContext="IW-Service" ShowInComObjectTree="true">
 
                       <ParameterSeparator Id="%AID%_PS-nnn" Text="Kanaldefinition" UIHint="Headline" />
                       <ParameterRefRef RefId="%AID%_P-%TT%%CC%000_R-%TT%%CC%00001" IndentLevel="1" HelpContext="BASE-ChannelName" />
