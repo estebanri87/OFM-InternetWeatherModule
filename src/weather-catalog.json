@@ -27,14 +27,14 @@
   ],
 
   "categories": [
-    { "value": 1, "key": "uebersicht",       "label": "Zusammenfassung und Überblick", "icon": "text-box-outline" },
+    { "value": 1, "key": "uebersicht",       "label": "Zusammenfassung und Überblick", "icon": "format-list-text" },
     { "value": 2, "key": "temperatur",       "label": "Temperatur",                    "icon": "thermometer" },
     { "value": 3, "key": "feuchte_druck",    "label": "Feuchte und Druck",             "icon": "water-percent" },
-    { "value": 4, "key": "wind",             "label": "Wind",                          "icon": "weather-windy" },
+    { "value": 4, "key": "wind",             "label": "Wind",                          "icon": "windsock" },
     { "value": 5, "key": "niederschlag",     "label": "Niederschlag",                  "icon": "weather-pouring" },
     { "value": 6, "key": "bewoelkung_sonne", "label": "Bewölkung und Sonne",           "icon": "weather-partly-cloudy" },
-    { "value": 7, "key": "strahlung",        "label": "Strahlung",                     "icon": "sun-wireless-outline" },
-    { "value": 8, "key": "landwirtschaft",   "label": "Landwirtschaft",                "icon": "sprout-outline" }
+    { "value": 7, "key": "strahlung",        "label": "Strahlung",                     "icon": "white-balance-sunny" },
+    { "value": 8, "key": "landwirtschaft",   "label": "Landwirtschaft",                "icon": "leak" }
   ],
 
   "measurements": [

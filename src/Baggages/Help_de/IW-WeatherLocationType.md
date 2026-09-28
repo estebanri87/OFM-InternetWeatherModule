@@ -1,6 +1,7 @@
-### Wetterort
+﻿### Ort
 
-Ort für den das Wetter bestimmt werden soll
+Ort, für den das Wetter bestimmt werden soll.
 
-* Gerätestandort (Geo-Koordinaten sind unter Einstellungen hinterlegt)
-* Anderer Ort (Geo-Koordinaten werden hier im Kanal eingestellt)
+* **Gerätestandort aus Allgemein** — Die Geo-Koordinaten aus den allgemeinen Geräteeinstellungen werden verwendet.
+* **Anderer Ort** — Die Geo-Koordinaten werden hier im Kanal eingestellt.
+

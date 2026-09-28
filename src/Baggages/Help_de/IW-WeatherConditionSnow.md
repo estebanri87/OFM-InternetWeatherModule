@@ -1,4 +1,4 @@
-### Schnee
+﻿### Schnee
 
-Wird bei Schneevorhersage zusammen mit der Schneemenge verwendet.
-XXX wird durch die Schnee Zuwachshöhe in Millimeter ersetzt.
+Wird bei Schneefall verwendet. `XXX` wird durch die Schneemenge in Millimetern ersetzt.
+

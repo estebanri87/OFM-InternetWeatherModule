@@ -1,3 +1,4 @@
-### Sonne
+﻿### Wolkenlos
 
-Wird bei der Prognose "Sonne ohne Wolken" verwendet.
+Wird verwendet, wenn weder nennenswerter Niederschlag noch nennenswerte Bewölkung vorliegt.
+

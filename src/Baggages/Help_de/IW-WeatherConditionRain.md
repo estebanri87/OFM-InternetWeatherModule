@@ -1,4 +1,4 @@
-### Regen
+﻿### Regen
 
-Wird bei Regenvorhersage zusammen mit der Regenmenge verwendet.
-XXX wird durch die Wassersäule in Millimeter ersetzt. Dies entspricht den Litern pro Quatratmeter.
+Wird bei Regen verwendet. `XXX` wird durch die Regenmenge in Millimetern ersetzt.
+

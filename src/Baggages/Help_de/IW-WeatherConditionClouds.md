@@ -1,4 +1,4 @@
-### Wolken
+﻿### Wolken
 
-Wird bei Wolken zusammen dem Prozent der Bedeckung angezeigt.
-XXX wird durch den Prozentwert der Bedeckung ersetzt.
+Wird bei Bewölkung verwendet. `XXX` wird durch den Prozentwert der Bedeckung ersetzt.
+

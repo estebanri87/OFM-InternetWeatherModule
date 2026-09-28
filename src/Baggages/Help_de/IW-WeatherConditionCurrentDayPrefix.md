@@ -1,3 +1,4 @@
-### Prefix aktueller Tag
+﻿### Prefix aktueller Tag
 
-Wird als Prefix für die Prognose für den aktuellen Tag verwendet.
+Wird dem Text vorangestellt, wenn der Slot den aktuellen Tag ausgibt, also bei Offset 0.
+
