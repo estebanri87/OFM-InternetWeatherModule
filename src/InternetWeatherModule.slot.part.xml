@@ -268,7 +268,7 @@
                             </when>
                           </choose>
                         </when>
-                        <when test="1 4 13 14 15 23 24 25 53 57 61 73 77 81 83 94 95 96 97 120 131">
+                        <when test="1 4 13 14 15 23 24 25 32 43 46 53 57 61 73 77 81 83 92 94 95 96 97 120 131">
                           <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+26%_R-%TT%%CC%%SPP+26%01">
                             <when test="1 4 61 96 97">
                               <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+32%_R-%TT%%CC%%SPP+32%01" HelpContext="IW-SlotOffset" />

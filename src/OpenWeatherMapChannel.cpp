@@ -1,118 +1,171 @@
 #include "OpenWeatherMapChannel.h"
-#ifdef ARDUINO_ARCH_RP2040 
-#define OpenWeatherMapUrl "http://api.openweathermap.org/data/3.0/onecall?units=metric&lang=de&exclude=minutely,alerts"
+#include "ArduinoJson.h"
+#include "HTTPClient.h"
+
+// One Call 3.0 liefert 48 Stunden und 8 Tage in einer Antwort.
+#define IW_OWM_MAX_SERIES 48
+
+#ifdef ARDUINO_ARCH_RP2040
+    #define IW_OWM_BASE "http://api.openweathermap.org/data/3.0/onecall"
 #else
-#define OpenWeatherMapUrl "https://api.openweathermap.org/data/3.0/onecall?units=metric&lang=de&exclude=minutely,alerts"
+    #define IW_OWM_BASE "https://api.openweathermap.org/data/3.0/onecall"
 #endif
 
-OpenWeatherMapChannel::OpenWeatherMapChannel(uint8_t index)
-    : BaseWeatherChannel(index)
+namespace
 {
-}
+    // Loest einen Katalog-Pfad wie "temp.morn" oder "weather.0.id" auf.
+    JsonVariant resolvePath(JsonVariant node, const char* path)
+    {
+        const char* cursor = path;
+        char part[24];
 
-const std::string OpenWeatherMapChannel::name()
-{
-    return "OpenWeatherMap";
-}
+        while (*cursor != '\0' && !node.isNull())
+        {
+            uint8_t len = 0;
+            while (*cursor != '\0' && *cursor != '.' && len < sizeof(part) - 1)
+                part[len++] = *cursor++;
+            part[len] = '\0';
+            if (*cursor == '.') cursor++;
 
-int16_t OpenWeatherMapChannel::fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather)
-{
-    String url = OpenWeatherMapUrl;
-    url += "&appid=";
-    url += (const char*)ParamIW_OpenWeatherMap_APIKey;
-    url += "&lat=";
-    url += ParamIW_CHWeatherLocationType == 0 ? ParamBASE_Latitude : ParamIW_CHLatitude;
-    url += "&lon=";
-    url += ParamIW_CHWeatherLocationType == 0 ? ParamBASE_Longitude : ParamIW_CHLongitude;
-    logDebugP("Call: %s", url.c_str());
-    HTTPClient http;
-#ifdef ARDUINO_ARCH_RP2040   
-    if (url.startsWith("https://"))
-        http.setInsecure();
-#endif
-    http.begin(url);
+            bool numeric = (len > 0);
+            for (uint8_t i = 0; i < len; i++)
+                if (part[i] < '0' || part[i] > '9') { numeric = false; break; }
 
-    // Send HTTP GET request
-    auto httpStatus = http.GET();
-    if (httpStatus != 200)
-    {   
-        http.end();
-        return httpStatus;
+            // Getrennt zuweisen: ArduinoJson liefert für Index- und Namenszugriff
+            // verschiedene Proxy-Typen, die sich nicht in einem ?: vereinen lassen.
+            if (numeric)
+                node = node[(size_t)atoi(part)];
+            else
+                node = node[part];
+        }
+        return node;
     }
-    JsonDocument doc;
-    DeserializationError jsonErr = deserializeJson(doc, http.getString());
+} // namespace
+
+int16_t OpenWeatherMapChannel::fetch(const WeatherRequest& request)
+{
+    const std::string apiKey = ParamIW_OpenWeatherMap_APIKeyStr;
+    if (apiKey.empty())
+    {
+        logErrorP("Kein API Key hinterlegt, One Call 3.0 erfordert ein Abonnement");
+        return -3;
+    }
+
+    std::string url = IW_OWM_BASE;
+    url += "?units=metric&lang=de&exclude=minutely,alerts";
+    url += "&lat=" + std::to_string(request.latitude);
+    url += "&lon=" + std::to_string(request.longitude);
+    url += "&appid=" + apiKey;
+
+    logDebugP("GET %s (Key ausgeblendet)", IW_OWM_BASE);
+
+    HTTPClient http;
+#ifdef ARDUINO_ARCH_RP2040
+    if (url.rfind("https://", 0) == 0) http.setInsecure();
+#endif
+    http.begin(url.c_str());
+    http.setTimeout(8000);
+
+    openknx.watchdog.loop();
+    const int httpStatus = http.GET();
+    openknx.watchdog.loop();
+
+    if (httpStatus != 200)
+    {
+        http.end();
+        return (int16_t)httpStatus;
+    }
+
+    const String body = http.getString();
     http.end();
-    if (jsonErr) {
-        logErrorP("JSON parse error: %s", jsonErr.c_str());
+    openknx.watchdog.loop();
+
+    JsonDocument doc;
+    if (deserializeJson(doc, body) != DeserializationError::Ok)
+    {
+        logErrorP("JSON konnte nicht gelesen werden");
         return -2;
     }
 
-    JsonObject current = doc["current"];
-    fillForecast(current, currentWeather);
-  
-    JsonArray daily = doc["daily"];
-    int availableDays = daily.size();
-    int daysToFill = (numDays < availableDays) ? numDays : availableDays;
-    for (int i = 0; i < daysToFill; i++)
+    const int32_t tzOffset = doc["timezone_offset"] | 0;
+
+    // Aktuelle Werte
+    const WeatherLevelRequest& currentReq = request.level(WeatherLevel::Current);
+    if (currentReq.used && !doc["current"].isNull())
     {
-        JsonObject dayObj = daily[i];
-        fillForecast(dayObj, dayForecasts[i]);
+        JsonVariant current = doc["current"];
+        const time_t at = (time_t)(current["dt"] | 0);
+        for (uint8_t i = 0; i < currentReq.varCount; i++)
+        {
+            JsonVariant v = resolvePath(current, currentReq.vars[i]);
+            // Regen und Schnee fehlen bei trockenem Wetter ganz - das ist 0, kein Fehler.
+            const float value = v.isNull() ? 0.0f : v.as<float>();
+            applyCurrent(currentReq.vars[i], value, at);
+        }
     }
 
-    JsonArray hourly = doc["hourly"];
-    JsonObject hour1 = hourly[1];
-    fillForecast(hour1, hour1Weather);
-    JsonObject hour2 = hourly[2];
-    fillForecast(hour2, hour2Weather);
+    time_t* times = new time_t[IW_OWM_MAX_SERIES];
+    float* values = new float[IW_OWM_MAX_SERIES];
 
-    return httpStatus;
-}
+    const WeatherLevel levels[] = {WeatherLevel::Hourly, WeatherLevel::Daily};
+    const char* sections[] = {"hourly", "daily"};
 
-void OpenWeatherMapChannel::fillForecast(JsonObject& json, CurrentWheatherData& wheater)
-{
-    wheater.temperature_C = json["temp"];                  // 22.34
-    wheater.temperatureFeelsLike_C = json["feels_like"];   // 21.95
-    wheater.humidity_percent = json["humidity"];                 // 69
-    wheater.pressure_hPa = json["pressure"];                 // 1006
-    wheater.windSpeed_Km_h = 3.6 * (float)json["wind_speed"]; // 69
-    wheater.windGust_Km_h = 3.6 * (float)json["wind_gust"];   // 69
-    wheater.windDirection_deg = json["wind_deg"];            // 70
-    JsonObject rainObject = json["rain"];
-    wheater.rain_mm = rainObject ? (float) rainObject["1h"] : (float)0; // 2.5
-    JsonObject snowObject = json["snow"];
-    wheater.snow_mm = snowObject ? (float) snowObject["1h"] : (float)0; // 2.5
-    wheater.uvi_unitOne = json["uvi"];                                 // 6.29
-    wheater.cloudsCover_percent = json["clouds"];                           // 40
-}
+    for (uint8_t l = 0; l < 2; l++)
+    {
+        const WeatherLevelRequest& lr = request.level(levels[l]);
+        if (!lr.used) continue;
 
-void OpenWeatherMapChannel::fillForecast(JsonObject& json, ForecastHourWheatherData& wheater)
-{
-    fillForecast(json, (CurrentWheatherData&) wheater);
-    wheater.probabilityOfPrecipitation_percent = round(100. * (float) json["pop"]);    // 0.70
-}
+        JsonArray entries = doc[sections[l]];
+        if (entries.isNull()) continue;
 
-void OpenWeatherMapChannel::fillForecast(JsonObject& json, ForecastDayWheatherData& wheater)
-{
-    JsonObject tempObject = json["temp"];
-    wheater.temperatureDay_C = tempObject["day"];     // 21.95
-    wheater.temperatureNight_C = tempObject["night"]; // 21.95
-    wheater.temperatureEvening_C = tempObject["eve"]; // 21.95
-    wheater.temperatureMorning_C = tempObject["morn"]; // 21.95
-    wheater.temperatureMin_C = tempObject["min"];      // 21.95
-    wheater.temperatureMax_C = tempObject["max"];      // 21.95
-    tempObject = json["feels_like"];
-    wheater.temperatureFeelsLikeDay_C = tempObject["day"];     // 21.95
-    wheater.temperatureFeelsLikeNight_C = tempObject["night"]; // 21.95
-    wheater.temperatureFeelsLikeEvening_C = tempObject["eve"]; // 21.95
-    wheater.temperatureFeelsLikeMorning_C = tempObject["morn"]; // 21.95
-    wheater.humidity_percent = json["humidity"];                 // 69
-    wheater.pressure_hPa = json["pressure"];                 // 1006
-    wheater.windSpeed_Km_h = 3.6 * (float)json["wind_speed"]; // 69
-    wheater.windGust_Km_h = 3.6 * (float)json["wind_gust"];   // 69
-    wheater.windDirection_deg = json["wind_deg"];            // 70
-    wheater.rain_mm = json["rain"];                         // 2.5
-    wheater.snow_mm = json["snow"];                         // 2.5
-    wheater.probabilityOfPrecipitation_percent = round(100. * (float) json["pop"]);    // 0.70
-    wheater.uvi_unitOne = json["uvi"];                           // 6.29
-    wheater.cloudsCover_percent = json["clouds"];                     // 40
+        const bool daily = (levels[l] == WeatherLevel::Daily);
+
+        uint16_t count = 0;
+        for (JsonVariant entry : entries)
+        {
+            if (count >= IW_OWM_MAX_SERIES) break;
+            const int64_t dt = entry["dt"] | 0;
+            if (daily)
+            {
+                // "dt" liegt mitten am Tag; der Slot braucht den Beginn des
+                // lokalen Kalendertages als UTC-Epoche.
+                const int64_t shifted = dt + tzOffset;
+                times[count] = (time_t)((shifted / 86400) * 86400 - tzOffset);
+            }
+            else
+                times[count] = (time_t)dt;
+            count++;
+        }
+        if (count == 0) continue;
+
+        for (uint8_t i = 0; i < lr.varCount; i++)
+        {
+            const bool isTimeOfDay = (strcmp(lr.vars[i], "sunrise") == 0 || strcmp(lr.vars[i], "sunset") == 0);
+            const bool optional = (strncmp(lr.vars[i], "rain", 4) == 0 || strncmp(lr.vars[i], "snow", 4) == 0);
+
+            uint16_t n = 0;
+            for (JsonVariant entry : entries)
+            {
+                if (n >= count) break;
+                JsonVariant v = resolvePath(entry, lr.vars[i]);
+                if (v.isNull())
+                    values[n] = optional ? 0.0f : NAN;
+                else if (isTimeOfDay)
+                {
+                    const int64_t shifted = (int64_t)v.as<int64_t>() + tzOffset;
+                    const int64_t midnight = (shifted / 86400) * 86400;
+                    values[n] = (float)(shifted - midnight);
+                }
+                else
+                    values[n] = v.as<float>();
+                n++;
+            }
+            if (n > 0) applySeries(levels[l], lr.vars[i], times, values, n);
+        }
+        openknx.watchdog.loop();
+    }
+
+    delete[] times;
+    delete[] values;
+    return 200;
 }

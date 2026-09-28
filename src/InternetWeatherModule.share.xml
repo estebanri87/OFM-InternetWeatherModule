@@ -300,6 +300,7 @@
 									<Enumeration Text="Gefühlte Temperatur Mittel - Tageswerte" Value="25" Id="%ENID%" />
 									<Enumeration Text="Taupunkt - Aktuell" Value="30" Id="%ENID%" />
 									<Enumeration Text="Taupunkt - Stundenwerte" Value="31" Id="%ENID%" />
+									<Enumeration Text="Taupunkt - Tageswerte" Value="32" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
 							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoFeuchteDruck" Name="IWMeasurandOpenmeteoFeuchteDruck" op:headerExport="base" op:headerName="Measurand">
@@ -308,8 +309,10 @@
 									<Enumeration Text="Relative Luftfeuchte (2 m) - Aktuell" Value="40" Id="%ENID%" />
 									<Enumeration Text="Relative Luftfeuchte (2 m) - 15-Minuten-Werte" Value="41" Id="%ENID%" />
 									<Enumeration Text="Relative Luftfeuchte (2 m) - Stundenwerte" Value="42" Id="%ENID%" />
+									<Enumeration Text="Relative Luftfeuchte (2 m) - Tageswerte" Value="43" Id="%ENID%" />
 									<Enumeration Text="Luftdruck - Aktuell" Value="44" Id="%ENID%" />
 									<Enumeration Text="Luftdruck - Stundenwerte" Value="45" Id="%ENID%" />
+									<Enumeration Text="Luftdruck - Tageswerte" Value="46" Id="%ENID%" />
 								</TypeRestriction>
 							</ParameterType>
 							<ParameterType Id="%AID%_PT-IWMeasurandOpenmeteoWind" Name="IWMeasurandOpenmeteoWind" op:headerExport="base" op:headerName="Measurand">
@@ -353,6 +356,7 @@
 									<Enumeration Text="Bitte wählen..." Value="0" Id="%ENID%" />
 									<Enumeration Text="Bewölkung - Aktuell" Value="90" Id="%ENID%" />
 									<Enumeration Text="Bewölkung - Stundenwerte" Value="91" Id="%ENID%" />
+									<Enumeration Text="Bewölkung - Tageswerte" Value="92" Id="%ENID%" />
 									<Enumeration Text="Sonnenscheindauer - Stundenwerte" Value="93" Id="%ENID%" />
 									<Enumeration Text="Sonnenscheindauer - Tageswerte" Value="94" Id="%ENID%" />
 									<Enumeration Text="Tageslichtdauer - Tageswerte" Value="95" Id="%ENID%" />

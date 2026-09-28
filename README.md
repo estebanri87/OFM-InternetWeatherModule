@@ -6,37 +6,44 @@ Dies ist ein Modul zur Integration von Internet Wetterdiensten.
 
 Das Modul setzt [OFM-Network](https://github.com/OpenKNX/OFM-Network) oder [OFM-WLAN](https://github.com/mgeramb/OFM-WLANModule) voraus.
 
-## Features
+## Konzept
 
-- Aktuelle Werte
-- Prognose Heute
-- Prognose Morgen
-- Prognose Umschaltbar Heute/Morgen
-- Prognose nächste Stunde
-- Prognose übernächste Stunde
+Ein Kanal steht für **einen Ort** und hat **drei frei belegbare Wert-Slots** (Wetter A, B und C). Je Slot wird ausgewählt:
 
-KO's für
-- Wetterbeschreibung
-- Tagestemperatur
-- Nachttemperatur
-- Frühtemperatur
-- Abendtemperatur
-- Minimum Temperatur
-- Maximum Temperatur
-- Gefühlte Tagestemperatur
-- Gefühlte Nachtemperatur
-- Gefühlte Frühtemperatur
-- Gefühlte Abendtemperatur
-- Luftdruck
-- Luftfeuchte
-- Wind
-- Windböen
-- Windrichtung
-- Regen
-- Schnee
-- Niederschlagswahrscheinlichkeit
-- UV-Index
-- Wolken
+| Einstellung | Bedeutung |
+|---|---|
+| Kategorie | Fachliche Gruppe, filtert die Messwert-Liste |
+| Messwert | Messgröße samt Zeitebene, z.B. „Temperatur (2 m) - Stundenwerte" |
+| Typ | Einzelwert oder Aggregation über ein Intervall |
+| Offset | Abstand zum aktuellen Rasterschritt, Einheit richtet sich nach der Zeitebene |
+| bis Offset, Aggregation | Nur bei Intervall: Mittelwert, Minimum, Maximum oder Summe |
+| Senden | Nur bei Änderung oder bei jedem Abruf |
+
+Damit lassen sich ohne zusätzliche Logikkanäle unter anderem abbilden:
+
+- **drei Größen zu einem Zeitpunkt** — A/B/C mit verschiedenem Messwert, alle Offset 0
+- **eine Größe zu drei Zeitpunkten** — gleicher Messwert, Offset 0/1/2
+- **drei Aggregate über ein Intervall** — gleicher Messwert und Intervall, Aggregation Mittel/Min/Max
+
+Werden mehr als drei Werte für denselben Ort gebraucht, wird ein weiterer Kanal mit denselben Koordinaten angelegt.
+
+Der Datenpunkttyp des Kommunikationsobjekts richtet sich automatisch nach dem gewählten Messwert. Abgefragt werden nur die Variablen und nur der Zeitraum, die von den belegten Slots gebraucht werden; mehrere Slots auf derselben Größe kosten keinen zusätzlichen Abruf.
+
+## Wetterdienste
+
+| | Aktuell | 15-Minuten-Werte | Stundenwerte | Tageswerte |
+|---|:--:|:--:|:--:|:--:|
+| Open-Meteo | ✓ | ✓ | 168 Stunden | 16 Tage |
+| OpenWeatherMap (One Call 3.0) | ✓ | — | 48 Stunden | 8 Tage |
+
+**Nur bei Open-Meteo:** 15-Minuten-Werte, Strahlungsgrößen, Sonnenscheindauer, Tageslichtdauer, ET₀ und Werte aus der Vergangenheit (negative Offsets).
+**Nur bei OpenWeatherMap:** Temperatur und gefühlte Temperatur für Morgen, Tag, Abend und Nacht als Tageswerte, sowie die Sichtweite.
+
+Der vollständige Messwert-Katalog steht in [`src/weather-catalog.json`](src/weather-catalog.json) und ist in der [Applikationsbeschreibung](doc/Applikationsbeschreibung-InternetWeather.md) tabellarisch aufgeführt.
+
+## Katalog pflegen
+
+`src/weather-catalog.json` ist die einzige Pflegestelle. Daraus erzeugt `tools/Generate-Catalog.ps1` die ETS-Parametertypen, das Slot-Fragment und die C++-Metadaten; `tools/Verify-Catalog.ps1` prüft jede Kombination gegen die Live-API.
 
 ## Release Notes
 

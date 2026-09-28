@@ -83,14 +83,14 @@ static const WeatherMeasurandInfo IW_MEASURANDS[IW_MEASURAND_COUNT] =
     {  29, { "feels_like.night", 1.0f },      { nullptr, 1.0f },                 WeatherLevel::Daily,       WeatherDpt::Dpt9_1,     true  },   // GefuehlteTemperaturNachtDay
     {  30, { "dew_point", 1.0f },             { "dew_point_2m", 1.0f },          WeatherLevel::Current,     WeatherDpt::Dpt9_1,     true  },   // TaupunktCur
     {  31, { "dew_point", 1.0f },             { "dew_point_2m", 1.0f },          WeatherLevel::Hourly,      WeatherDpt::Dpt9_1,     true  },   // TaupunktHour
-    {  32, { "dew_point", 1.0f },             { nullptr, 1.0f },                 WeatherLevel::Daily,       WeatherDpt::Dpt9_1,     true  },   // TaupunktDay
+    {  32, { "dew_point", 1.0f },             { "dew_point_2m_mean", 1.0f },     WeatherLevel::Daily,       WeatherDpt::Dpt9_1,     true  },   // TaupunktDay
     {  40, { "humidity", 1.0f },              { "relative_humidity_2m", 1.0f },  WeatherLevel::Current,     WeatherDpt::Dpt9_7,     true  },   // RelativeLuftfeuchte2MCur
     {  41, { nullptr, 1.0f },                 { "relative_humidity_2m", 1.0f },  WeatherLevel::Minutely15,  WeatherDpt::Dpt9_7,     true  },   // RelativeLuftfeuchte2MQ15
     {  42, { "humidity", 1.0f },              { "relative_humidity_2m", 1.0f },  WeatherLevel::Hourly,      WeatherDpt::Dpt9_7,     true  },   // RelativeLuftfeuchte2MHour
-    {  43, { "humidity", 1.0f },              { nullptr, 1.0f },                 WeatherLevel::Daily,       WeatherDpt::Dpt9_7,     true  },   // RelativeLuftfeuchte2MDay
+    {  43, { "humidity", 1.0f },              { "relative_humidity_2m_mean", 1.0f }, WeatherLevel::Daily,       WeatherDpt::Dpt9_7,     true  },   // RelativeLuftfeuchte2MDay
     {  44, { "pressure", 100.0f },            { "surface_pressure", 100.0f },    WeatherLevel::Current,     WeatherDpt::Dpt9_6,     true  },   // LuftdruckCur
     {  45, { "pressure", 100.0f },            { "surface_pressure", 100.0f },    WeatherLevel::Hourly,      WeatherDpt::Dpt9_6,     true  },   // LuftdruckHour
-    {  46, { "pressure", 100.0f },            { nullptr, 1.0f },                 WeatherLevel::Daily,       WeatherDpt::Dpt9_6,     true  },   // LuftdruckDay
+    {  46, { "pressure", 100.0f },            { "surface_pressure_mean", 100.0f }, WeatherLevel::Daily,       WeatherDpt::Dpt9_6,     true  },   // LuftdruckDay
     {  47, { "visibility", 1.0f },            { nullptr, 1.0f },                 WeatherLevel::Current,     WeatherDpt::Dpt7_1,     true  },   // SichtweiteCur
     {  48, { "visibility", 1.0f },            { nullptr, 1.0f },                 WeatherLevel::Hourly,      WeatherDpt::Dpt7_1,     true  },   // SichtweiteHour
     {  50, { "wind_speed", 3.6f },            { "wind_speed_10m", 1.0f },        WeatherLevel::Current,     WeatherDpt::Dpt9_28,    true  },   // Windgeschwindigkeit10MCur
@@ -121,7 +121,7 @@ static const WeatherMeasurandInfo IW_MEASURANDS[IW_MEASURAND_COUNT] =
     {  83, { "pop", 100.0f },                 { "precipitation_probability_max", 1.0f }, WeatherLevel::Daily,       WeatherDpt::Dpt5_1,     true  },   // NiederschlagswahrscheinlichkeitMaximumDay
     {  90, { "clouds", 1.0f },                { "cloud_cover", 1.0f },           WeatherLevel::Current,     WeatherDpt::Dpt5_1,     true  },   // BewoelkungCur
     {  91, { "clouds", 1.0f },                { "cloud_cover", 1.0f },           WeatherLevel::Hourly,      WeatherDpt::Dpt5_1,     true  },   // BewoelkungHour
-    {  92, { "clouds", 1.0f },                { nullptr, 1.0f },                 WeatherLevel::Daily,       WeatherDpt::Dpt5_1,     true  },   // BewoelkungDay
+    {  92, { "clouds", 1.0f },                { "cloud_cover_mean", 1.0f },      WeatherLevel::Daily,       WeatherDpt::Dpt5_1,     true  },   // BewoelkungDay
     {  93, { nullptr, 1.0f },                 { "sunshine_duration", 1.0f },     WeatherLevel::Hourly,      WeatherDpt::Dpt7_5,     true  },   // SonnenscheindauerHour
     {  94, { nullptr, 1.0f },                 { "sunshine_duration", 1.0f },     WeatherLevel::Daily,       WeatherDpt::Dpt7_5,     true  },   // SonnenscheindauerDay
     {  95, { nullptr, 1.0f },                 { "daylight_duration", 1.0f },     WeatherLevel::Daily,       WeatherDpt::Dpt7_5,     true  },   // TageslichtdauerDay

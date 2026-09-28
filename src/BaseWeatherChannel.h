@@ -1,155 +1,88 @@
 #pragma once
-#include "OpenKNX.h"
+#include "WeatherSlot.h"
 
-#include "ArduinoJson.h"
-#include "HTTPClient.h"
+#define IW_LEVEL_COUNT 4
+#define IW_MAX_VARS_PER_LEVEL (IW_SLOT_COUNT + 3) // drei Slots plus Hilfsgrößen des Wetter-Textes
 
-
-// simple compile-time-checks for ko calculation
-#if ((IW_KoCHTomorrowDescription - IW_KoCHTodayDescription) != (IW_KoCHTomorrowClouds - IW_KoCHTodayClouds))
-    #error "KO offset for tomorrow is NOT constant!"
-#endif
-#if ((IW_KoCHForecastDescription - IW_KoCHTodayDescription) != (IW_KoCHForecastClouds - IW_KoCHTodayClouds))
-    #error "KO offset for switchable forecast is NOT constant!"
-#endif
-#if ((IW_KoCHTomorrowDescription - IW_KoCHTomorrowClouds) != (IW_KoCHForecastDescription - IW_KoCHForecastClouds))
-    #error "different structure of KO-groups"
-#endif
-
-// ko numbers relative to today forecast
-#define IW_KoOffset_Tomorrow (IW_KoCHTomorrowDescription - IW_KoCHTodayDescription)
-#define IW_KoOffset_Forecast (IW_KoCHForecastDescription - IW_KoCHTodayDescription)
-
-// ET0 KO offsets relative to the day's description KO
-#define IW_KoOffset_TodayET0    (IW_KoCHTodayET0 - IW_KoCHTodayDescription)
-#define IW_KoOffset_TomorrowET0 (IW_KoCHTomorrowET0 - IW_KoCHTomorrowDescription)
-#define IW_KoOffset_ForecastET0 (IW_KoCHForecastET0 - IW_KoCHForecastDescription)
-
-// Day 3-7 KO offsets relative to today forecast
-#define IW_KoOffset_Day3 (IW_KoCHDay3Description - IW_KoCHTodayDescription)
-#define IW_KoOffset_Day4 (IW_KoCHDay4Description - IW_KoCHTodayDescription)
-#define IW_KoOffset_Day5 (IW_KoCHDay5Description - IW_KoCHTodayDescription)
-#define IW_KoOffset_Day6 (IW_KoCHDay6Description - IW_KoCHTodayDescription)
-#define IW_KoOffset_Day7 (IW_KoCHDay7Description - IW_KoCHTodayDescription)
-
-// ET0 KO offsets for Day3-7 (relative to their own description KO)
-#define IW_KoOffset_Day3ET0 (IW_KoCHDay3ET0 - IW_KoCHDay3Description)
-#define IW_KoOffset_Day4ET0 (IW_KoCHDay4ET0 - IW_KoCHDay4Description)
-#define IW_KoOffset_Day5ET0 (IW_KoCHDay5ET0 - IW_KoCHDay5Description)
-#define IW_KoOffset_Day6ET0 (IW_KoCHDay6ET0 - IW_KoCHDay6Description)
-#define IW_KoOffset_Day7ET0 (IW_KoCHDay7ET0 - IW_KoCHDay7Description)
-
-// Number of forecast days
-#define IW_NUM_FORECAST_DAYS 7
-
-// Day KO offsets array helper (relative to IW_KoCHTodayDescription)
-static const int IW_KoOffset_Days[] = {
-    0,                    // Today
-    IW_KoOffset_Tomorrow, // Tomorrow
-    IW_KoOffset_Day3,     // Day 3
-    IW_KoOffset_Day4,     // Day 4
-    IW_KoOffset_Day5,     // Day 5
-    IW_KoOffset_Day6,     // Day 6
-    IW_KoOffset_Day7,     // Day 7
-};
-
-// ET0 KO offsets array helper (relative to each day's description KO)
-static const int IW_KoOffset_DayET0[] = {
-    IW_KoOffset_TodayET0,    // Today
-    IW_KoOffset_TomorrowET0, // Tomorrow
-    IW_KoOffset_Day3ET0,     // Day 3
-    IW_KoOffset_Day4ET0,     // Day 4
-    IW_KoOffset_Day5ET0,     // Day 5
-    IW_KoOffset_Day6ET0,     // Day 6
-    IW_KoOffset_Day7ET0,     // Day 7
-};
-
-
-struct CurrentWheatherData
+// Was ein Kanal von seinem Anbieter braucht: je Zeitebene die dedupliziert
+// benötigten Variablen und der abzudeckende Bereich in Rasterschritten,
+// relativ zum aktuellen Schritt.
+struct WeatherLevelRequest
 {
-    float temperature_C = 0;
-    float temperatureFeelsLike_C = 0;
-    float humidity_percent = 0;
-    uint16_t pressure_hPa = 0;
-    float windSpeed_Km_h = 0;
-    float windGust_Km_h = 0;
-    uint16_t windDirection_deg = 0;
-    float rain_mm = 0;
-    float snow_mm = 0;
-    float uvi_unitOne = 0;
-    uint8_t cloudsCover_percent = 0;
+    bool used = false;
+    int16_t from = 0;
+    int16_t to = 0;
+    const char* vars[IW_MAX_VARS_PER_LEVEL] = {};
+    uint8_t varCount = 0;
 };
 
-struct ForecastHourWheatherData
+struct WeatherRequest
 {
-    float temperature_C = 0;
-    float temperatureFeelsLike_C = 0;
-    float humidity_percent = 0;
-    uint16_t pressure_hPa = 0;
-    float windSpeed_Km_h = 0;
-    float windGust_Km_h = 0;
-    uint16_t windDirection_deg = 0;
-    uint8_t probabilityOfPrecipitation_percent = 0;
-    float rain_mm = 0;
-    float snow_mm = 0;
-    float uvi_unitOne = 0;
-    uint8_t cloudsCover_percent = 0;
+    float latitude = 0.0f;
+    float longitude = 0.0f;
+    WeatherLevelRequest levels[IW_LEVEL_COUNT];
+
+    const WeatherLevelRequest& level(WeatherLevel l) const { return levels[(uint8_t)l]; }
+    bool any() const;
 };
-
-
-struct ForecastDayWheatherData
-{
-    float temperatureMin_C = 0;
-    float temperatureMax_C = 0;
-    float temperatureMorning_C = 0;
-    float temperatureDay_C = 0;
-    float temperatureEvening_C = 0;
-    float temperatureNight_C = 0;
-
-    float temperatureFeelsLikeMorning_C = 0;
-    float temperatureFeelsLikeDay_C = 0;
-    float temperatureFeelsLikeEvening_C = 0;
-    float temperatureFeelsLikeNight_C = 0;
-
-    float humidity_percent = 0;
-    uint16_t pressure_hPa = 0;
-    float windSpeed_Km_h = 0;
-    float windGust_Km_h = 0;
-    uint16_t windDirection_deg = 0;
-    uint8_t probabilityOfPrecipitation_percent = 0;
-    float rain_mm = 0;
-    float snow_mm = 0;
-    float uvi_unitOne = 0;
-    uint8_t cloudsCover_percent = 0;
-    float et0_mm = NAN; // ET₀ Reference Evapotranspiration (only Open-Meteo)
-};
-
-struct ForecastDayWheatherDataWithDescription : ForecastDayWheatherData
-{
-    char description[15] = {0};
-};
-
 
 class BaseWeatherChannel : public OpenKNX::Channel
 {
-  private:
-    unsigned long _lastApiCall = 0;
-    unsigned long _updateIntervalInMs = 0;
-    bool _available = false;
-    ForecastDayWheatherDataWithDescription _dayForecasts[IW_NUM_FORECAST_DAYS];
-    void buildDescription(char* description, float rain, float snow, uint8_t clouds, const char* prefix);
-    void updateDayForecastKo(ForecastDayWheatherDataWithDescription& day, int koOffset, int et0KoOffset);
-    void fetchData();
+  public:
+    void setup() override;
+    void loop() override;
+    void processInputKo(GroupObject& ko) override;
+    virtual bool processCommand(const std::string cmd, bool diagnoseKo);
+    const std::string name() override { return "WeatherChannel"; }
+
+    // Vom Modul gesteuert: nur ein Kanal ruft gleichzeitig ab.
+    bool fetchDue(uint32_t nowMs) const;
+    void requestFetch() { _fetchPending = true; }
+    void fetchNow();
+
+    uint16_t bufferBytes() const;
+    void logSlots();
 
   protected:
     BaseWeatherChannel(uint8_t index);
-    virtual int16_t fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather) = 0;
-    void setValueCompare(GroupObject& groupObject, const KNXValue& value, const Dpt& type);
-    void setValueCompare(uint goNumber, const KNXValue& value, const Dpt& type);
 
-  public:
-    void loop() override;
-    void setup() override;
-    void processInputKo(GroupObject& ko) override;
-    virtual bool processCommand(const std::string cmd, bool diagnoseKo);
+    // Vom Anbieter zu implementieren. Rückgabe: HTTP-Status, oder negativ bei
+    // Verarbeitungsfehlern. Der Anbieter reicht jede geparste Reihe über
+    // applySeries() bzw. applyCurrent() zurück.
+    virtual int16_t fetch(const WeatherRequest& request) = 0;
+    virtual WeatherProvider provider() const = 0;
+
+    // Vom Anbieter aufzurufen, sobald eine Reihe geparst ist.
+    void applySeries(WeatherLevel level, const char* var, const time_t* times, const float* values, uint16_t count);
+    void applyCurrent(const char* var, float value, time_t at);
+
+    // Hilfsgrößen des OpenKNX Wetter-Textes für diesen Anbieter (Regen, Schnee, Bewölkung).
+    const char* textHelperVar(uint8_t which) const;
+
+  private:
+    void buildRequest(WeatherRequest& request) const;
+    void publishSlot(uint8_t slotIndex, time_t now);
+    void buildWeatherText(char* target, uint8_t slotIndex, time_t now) const;
+    void addVar(WeatherLevelRequest& lr, const char* var) const;
+
+    WeatherSlot _slots[IW_SLOT_COUNT];
+    float _lastSent[IW_SLOT_COUNT] = {NAN, NAN, NAN};
+    char _lastText[IW_SLOT_COUNT][15] = {};
+
+    // Der OpenKNX Wetter-Text wird aus Regen, Schnee und Bewölkung gebaut. Er ist
+    // der einzige abgeleitete Messwert, deshalb genügen drei Einzelwerte für den
+    // konfigurierten Offset statt einer eigenen Zeitreihe. Der Text wird beim
+    // Abruf gebildet; bei Tageswerten reicht das, weil sich die Tagesgrenze nur
+    // einmal täglich verschiebt und das Abrufintervall höchstens eine Stunde ist.
+    int8_t _textSlotIndex = -1;
+    float _textRain = NAN;
+    float _textSnow = NAN;
+    float _textClouds = NAN;
+
+    uint32_t _updateIntervalMs = 0;
+    uint32_t _lastFetchMs = 0;
+    uint32_t _nextFetchMs = 0;
+    uint32_t _lastEvaluateMs = 0;
+    bool _fetchPending = false;
+    int16_t _lastHttpStatus = 0;
 };

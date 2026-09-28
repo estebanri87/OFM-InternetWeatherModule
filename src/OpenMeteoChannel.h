@@ -3,16 +3,15 @@
 
 class OpenMeteoChannel : public BaseWeatherChannel
 {
-  private:
-    float avg(JsonArray& arr, int begin, int n);
-    void fillForecast(JsonObject& json, JsonObject& jsonHourly, int vi, ForecastDayWheatherData& wheater);
-    void fillForecast(JsonObject& json, CurrentWheatherData& wheater);
-    void fillForecast(JsonObject& json, int vi, ForecastHourWheatherData& wheater);
+  public:
+    OpenMeteoChannel(uint8_t index) : BaseWeatherChannel(index) {}
 
   protected:
-    int16_t fillWeather(CurrentWheatherData& currentWeather, ForecastDayWheatherDataWithDescription* dayForecasts, int numDays, ForecastHourWheatherData& hour1Weather, ForecastHourWheatherData& hour2Weather) override;
+    int16_t fetch(const WeatherRequest& request) override;
+    WeatherProvider provider() const override { return WeatherProvider::OpenMeteo; }
 
-  public:
-    OpenMeteoChannel(uint8_t index);
-    const std::string name() override;
+  private:
+    std::string buildUrl(const WeatherRequest& request) const;
+    void appendLevel(std::string& url, const WeatherRequest& request, WeatherLevel level,
+                     const char* section, const char* pastParam, const char* forecastParam) const;
 };
