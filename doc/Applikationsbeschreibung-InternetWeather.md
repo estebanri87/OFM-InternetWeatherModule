@@ -52,22 +52,14 @@ Das Modul fragt nur die Variablen und nur den Zeitraum ab, die von den drei Slot
 
 Bestimmt, von welchem Dienst die Daten dieses Kanals kommen — und damit zugleich, welche Kategorien und Messwerte die Slots anbieten.
 
-| Wert | Bedeutung |
-|------|-----------|
-| Deaktiviert | Kanal ist inaktiv und erscheint nicht in der Baumansicht |
-| OpenWeatherMap | One Call 3.0, erfordert ein Abonnement und einen API Key |
-| Open-Meteo | Freie Nutzung unter CC BY 4.0, optional mit Abo und eigenem Server |
+* **Deaktiviert** — Kanal ist inaktiv und erscheint nicht in der Baumansicht.
+* **OpenWeatherMap** — One Call 3.0, erfordert ein Abonnement und einen API Key.
+* **Open-Meteo** — freie Nutzung unter CC BY 4.0, optional mit Abo und eigenem Server.
 
 Die Dienste unterscheiden sich im Angebot erheblich:
 
-| | Aktuell | 15-Minuten-Werte | Stundenwerte | Tageswerte |
-|---|:--:|:--:|:--:|:--:|
-| OpenWeatherMap | ✓ | — | 48 Stunden | 8 Tage |
-| Open-Meteo | ✓ | ✓ | 168 Stunden | 16 Tage |
-
-**Nur bei Open-Meteo:** 15-Minuten-Werte, Strahlungsgrößen, Sonnenscheindauer, Tageslichtdauer, ET₀ sowie Werte aus der Vergangenheit (negative Offsets).
-
-**Nur bei OpenWeatherMap:** Temperatur und gefühlte Temperatur für Morgen, Tag, Abend und Nacht als Tageswerte, sowie die Sichtweite.
+* **Open-Meteo** liefert aktuelle Werte, 15-Minuten-Werte, Stundenwerte bis 168 Stunden und Tageswerte bis 16 Tage voraus. Zusätzlich nur hier: Strahlungsgrößen, Sonnenscheindauer, Tageslichtdauer, ET₀ und Werte aus der Vergangenheit über negative Offsets.
+* **OpenWeatherMap** liefert aktuelle Werte, Stundenwerte bis 48 Stunden und Tageswerte bis 8 Tage voraus, aber keine 15-Minuten-Werte und keine Vergangenheit. Zusätzlich nur hier: Temperatur und gefühlte Temperatur für Morgen, Tag, Abend und Nacht als Tageswerte sowie die Sichtweite.
 
 Ein Wechsel des Dienstes behält die Slot-Einstellungen dort, wo beide Dienste dieselbe Größe liefern. Messwerte, die der neue Dienst nicht kennt, müssen neu gewählt werden.
 
@@ -205,16 +197,16 @@ Fachliche Gruppe, aus der der Messwert stammt. Die Kategorie dient nur der Vorau
 
 Verfügbare Kategorien:
 
-| Kategorie | Inhalt |
-|---|---|
-| Zusammenfassung und Überblick | OpenKNX Wetter-Text, Wettercode (WMO) |
-| Temperatur | Temperatur und gefühlte Temperatur |
-| Feuchte und Druck | Relative Luftfeuchte, Luftdruck |
-| Wind | Windgeschwindigkeit, Windböen, Windrichtung |
-| Niederschlag | Niederschlag, Regen, Schneefall, Niederschlagswahrscheinlichkeit |
-| Bewölkung und Sonne | Bewölkung, Sonnenscheindauer, Sonnenauf- und -untergang, Tageslichtdauer |
-| Strahlung | Global-, Direkt-, Diffus- und Direktnormalstrahlung, UV-Index |
-| Landwirtschaft | ET₀ Referenz-Verdunstung |
+* **Zusammenfassung und Überblick** — OpenKNX Wetter-Text, Wettercode
+* **Temperatur** — Temperatur, gefühlte Temperatur, Taupunkt
+* **Feuchte und Druck** — relative Luftfeuchte, Luftdruck, Sichtweite
+* **Wind** — Windgeschwindigkeit, Windböen, Windrichtung
+* **Niederschlag** — Niederschlag, Regen, Schneefall, Niederschlagswahrscheinlichkeit
+* **Bewölkung und Sonne** — Bewölkung, Sonnenscheindauer, Sonnenauf- und -untergang, Tageslichtdauer
+* **Strahlung** — Global-, Direkt-, Diffus- und Direktnormalstrahlung, UV-Index
+* **Landwirtschaft** — ET₀ Referenz-Verdunstung
+
+Angeboten werden nur die Kategorien, zu denen der gewählte Wetter-Service auch Messwerte liefert. Bei OpenWeatherMap fehlt daher die Landwirtschaft.
 
 ***Hinweis:*** Nach einem Wechsel der Kategorie muss der Messwert neu ausgewählt werden.
 
@@ -227,20 +219,18 @@ Verfügbare Kategorien:
 
 Die auszugebende Messgröße einschließlich ihrer **Zeitebene**. Die Zeitebene steht im Namen hinter dem Bindestrich:
 
-| Zeitebene | Bedeutung |
-|---|---|
-| **Aktuell** | Momentanwert. Kein Offset, keine Aggregation. |
-| **15-Minuten-Werte** | Viertelstundenraster. Offset in 1/4 Stunden. |
-| **Stundenwerte** | Stundenraster. Offset in Stunden. |
-| **Tageswerte** | Tagesraster. Offset in Tagen. |
+* **Aktuell** — Momentanwert, ohne Offset und ohne Aggregation.
+* **15-Minuten-Werte** — Viertelstundenraster, Offset in Viertelstunden.
+* **Stundenwerte** — Stundenraster, Offset in Stunden.
+* **Tageswerte** — Tagesraster, Offset in Tagen.
 
-Nicht jede Messgröße gibt es auf jeder Zeitebene — angeboten wird nur, was Open-Meteo tatsächlich liefert. So gibt es die Niederschlagswahrscheinlichkeit nur als Stunden- und Tageswert, Sonnenauf- und -untergang nur als Tageswert, und die Strahlungsgrößen nicht als Momentanwert.
+Nicht jede Messgröße gibt es auf jeder Zeitebene — angeboten wird nur, was der gewählte Wetter-Service tatsächlich liefert. So gibt es die Niederschlagswahrscheinlichkeit nur als Stunden- und Tageswert, Sonnenauf- und -untergang nur als Tageswert, und die Strahlungsgrößen nicht als Momentanwert.
 
-Bei Tageswerten ist die Aggregation bereits Teil des Messwerts, weil Open-Meteo Tageswerte fertig aggregiert liefert: "Temperatur (2 m) Maximum", "Temperatur (2 m) Minimum" und "Temperatur (2 m) Mittel" sind daher drei getrennte Einträge.
+Bei Tageswerten ist die Aggregation bereits Teil des Messwerts, weil beide Dienste Tageswerte fertig aggregiert liefern. "Temperatur Maximum", "Temperatur Minimum" und "Temperatur Mittel" sind daher drei getrennte Einträge.
 
 Der Datenpunkttyp des Kommunikationsobjekts richtet sich automatisch nach dem gewählten Messwert.
 
-***Hinweis:*** 15-Minuten-Werte liefert Open-Meteo nur dort, wo ein entsprechend hoch aufgelöstes Wettermodell verfügbar ist (Mitteleuropa, Nordamerika). Außerhalb dieser Gebiete bleibt der Wert leer.
+***Hinweis:*** 15-Minuten-Werte liefert Open-Meteo nur dort, wo ein entsprechend hoch aufgelöstes Wettermodell verfügbar ist, also in Mitteleuropa und Nordamerika. Außerhalb dieser Gebiete bleibt der Wert leer. OpenWeatherMap kennt diese Zeitebene gar nicht.
 
 <!-- DOCEND -->
 
@@ -265,13 +255,13 @@ Die Zeile erscheint nur bei Messwerten, die sich sinnvoll zusammenfassen lassen.
 
 Abstand vom aktuellen Zeitraster-Schritt. Die Einheit richtet sich nach der Zeitebene des gewählten Messwerts:
 
-| Zeitebene | Einheit | Bereich | Bedeutung von 0 |
-|---|---|---|---|
-| 15-Minuten-Werte | 1/4 Stunden | −192 … 671 | laufende Viertelstunde |
-| Stundenwerte | Stunden | −48 … 167 | laufende Stunde |
-| Tageswerte | Tage | −2 … 6 | heute |
+* **15-Minuten-Werte** zählen in Viertelstunden. 0 ist die laufende Viertelstunde.
+* **Stundenwerte** zählen in Stunden. 0 ist die laufende Stunde.
+* **Tageswerte** zählen in Tagen. 0 ist heute.
 
 Positive Werte zeigen in die Zukunft, negative in die Vergangenheit. Beispiele: Offset 1 bei Tageswerten ergibt "morgen", Offset −1 bei Stundenwerten die vergangene Stunde.
+
+Wie weit der Offset reichen darf, hängt vom Wetter-Service ab. Open-Meteo liefert 168 Stunden und 16 Tage voraus sowie 48 Stunden und 2 Tage zurück. OpenWeatherMap liefert 48 Stunden und 8 Tage voraus und kennt keine Vergangenheit; dort beginnt der Bereich bei 0.
 
 Bei "Intervall-Aggregationen" ist dies der **Beginn** des Intervalls.
 
