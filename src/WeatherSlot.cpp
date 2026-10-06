@@ -1,3 +1,4 @@
+#ifndef OPENKNX_INTERNETWEATHER_IGNORE
 #include "WeatherSlot.h"
 #include "WeatherAggregation.h"
 
@@ -216,3 +217,4 @@ void WeatherSlot::describe(char* buffer, size_t length, uint8_t slotIndex) const
         snprintf(buffer, length, "Wert %c: %s (%s) Offset %d, Puffer %u Byte",
                  letter, _var, weatherLevelName(_info->level), _offsetFrom, bufferBytes());
 }
+#endif

@@ -6,6 +6,15 @@ Dies ist ein Modul zur Integration von Internet Wetterdiensten.
 
 Das Modul setzt [OFM-Network](https://github.com/OpenKNX/OFM-Network) oder [OFM-WLAN](https://github.com/mgeramb/OFM-WLANModule) voraus.
 
+> [!WARNING]
+> ## Achtung blockierende Netzwerkabfragen!
+>
+> Die aktuelle Implementierung nutzt (derzeit noch) lange blockierende HTTP-Requests,
+> diese können die **Funktion bzw. das Zeitverhalten anderer Module stören**.
+> Von einem kombinierten Einsatz wird daher abgeraten, bzw. sollte dieser nur nach sorgfältiger Abwägung der Risiken erfolgen.
+>
+> Es ruft immer nur ein Kanal gleichzeitig ab, mit mindestens 3 Sekunden Abstand; ein einzelner Abruf blockiert aber bis zu 8 Sekunden.
+
 ## Konzept
 
 Ein Kanal steht für **einen Ort** und hat **drei frei belegbare Wert-Slots** (Wetter A, B und C). Je Slot wird ausgewählt:
@@ -74,14 +83,14 @@ In das Anwendungs XML muss OFM-Network (oder OFM-WLAN) und das OFM-InternetWeath
   <op:define prefix="IW" ModuleType="21"
     share=   "../lib/OFM-InternetWeatherModule/src/InternetWeatherModule.share.xml"
     template="../lib/OFM-InternetWeatherModule/src/InternetWeatherModule.templ.xml"
-    NumChannels="5"
+    NumChannels="30"
     KoSingleOffset="400"
     KoOffset="410">
-    <op:verify File="../lib/OFM-InternetWeatherModule/library.json" ModuleVersion="0.1" /> 
+    <op:verify File="../lib/OFM-InternetWeatherModule/library.json" ModuleVersion="0.7" /> 
   </op:define>
 ```
 
-**Hinweis:** Pro Kanal werden 102 KO's benötigt. Dies muss bei nachfolgenden Modulen bei KoOffset und KoSingleOffset entsprechend berücksichtigt werden.
+**Hinweis:** Pro Kanal werden 4 KOs benötigt (Diagnose sowie Wert A, B und C), bei 30 Kanälen also 120. Dazu kommt ein modulweites KO bei `KoSingleOffset`. Dies muss bei nachfolgenden Modulen bei KoOffset und KoSingleOffset entsprechend berücksichtigt werden.
 
 In main.cpp muss das ebenfalls das Network- (oder WLAN-) und InternetWeatherModule hinzugefügt werden:
 
@@ -100,16 +109,22 @@ void setup()
 }
 ```
 
-## Wetterdienste
+## Zugang zu den Wetterdiensten
 
 Die Architektur dieses Moduls erlaubt die Nutzung verschiedener Wetter-Dienste.
 
 Derzeit sind folgende Wetteranbieter integriert:
 
-* [OpenWeatherMap](#openweathermap)
 * [Open-Meteo](#open-meteo)
+* [OpenWeatherMap](#openweathermap)
 
 Pull Requests für weitere Dienste sind willkommen!
+
+### Open-Meteo
+
+[Open-Meteo](https://open-meteo.com/) ist eine "Open-Source-Wetter-API" und bietet für nicht-kommerzielle Nutzung einen Zugang ohne API-Key ("Free-API").
+Dieser ist auf maximal 10.000 gewichtete Aufrufe ("API calls") pro Tag beschränkt (Stand 2025-06-01, entspricht mit etwa 3.000 Aktualisierungen in Summe für alle Orte deutlich mehr als zu erwarten);
+Nutzungsbedingungen siehe https://open-meteo.com/en/terms (nur englisch).
 
 ### OpenWeatherMap
 
@@ -120,14 +135,6 @@ Bei der Subscription sollte das `Call per day limit` auf 1000 eingestellt werden
 ![Subscription](doc/IW-Subscription.png)
 
 Siehe https://openweathermap.org/price
-
-### Open-Meteo
-
-[Open-Meteo](https://open-meteo.com/) ist eine "Open-Source-Wetter-API" und bietet für nicht-kommerzielle Nutzung einen Zugang ohne API-Key ("Free-API").
-Dieser ist auf maximal 10.000 gewichtete Aufrufe ("API calls") pro Tag beschränkt (Stand 2025-06-01, entspricht mit etwa 3.000 Aktualisierungen in Summe für alle Orte deutlich mehr als zu erwarten);
-Nutzungsbedingungen siehe https://open-meteo.com/en/terms (nur englisch).
-
-
 
 ## Lizenz
 

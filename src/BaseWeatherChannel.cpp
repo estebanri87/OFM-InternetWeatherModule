@@ -1,3 +1,4 @@
+#ifndef OPENKNX_INTERNETWEATHER_IGNORE
 #include "BaseWeatherChannel.h"
 #include <string.h>
 
@@ -335,3 +336,4 @@ bool BaseWeatherChannel::processCommand(const std::string cmd, bool diagnoseKo)
     }
     return false;
 }
+#endif

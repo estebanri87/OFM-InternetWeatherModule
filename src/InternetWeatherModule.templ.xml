@@ -141,12 +141,12 @@
                       <!-- Dienstspezifische Hinweise -->
                       <choose ParamRefId="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101">
                         <when test="1">
-                          <ParameterSeparator Id="%AID%_PS-nnn" Text="One Call 3.0 erfordert ein Abonnement und einen API Key.&#10;Der API Key wird auf der Seite 'Basiseinstellungen' hinterlegt." UIHint="Information" />
+                          <ParameterSeparator Id="%AID%_PS-nnn" Text="One Call 3.0 erfordert ein Abonnement und einen API Key.&#10;Der API Key wird auf der Seite 'Internet Wetter'/'Allgemein' hinterlegt." UIHint="Information" />
                         </when>
                         <when test="2">
                           <choose ParamRefId="%AID%_UP-%TT%00020_R-%TT%0002001">
                             <when test="0">
-                              <ParameterSeparator Id="%AID%_PS-nnn" Text="Nutzung/Lizenz muss ausgewählt werden zur Verwendung von Open-Meteo!&#10;Hinweis: Die Einstellung kann auf der Seite 'Basiseinstellungen' vorgenommen werden." UIHint="Error" />
+                              <ParameterSeparator Id="%AID%_PS-nnn" Text="Nutzung/Lizenz muss ausgewählt werden zur Verwendung von Open-Meteo!&#10;Hinweis: Die Einstellung kann auf der Seite 'Internet Wetter'/'Allgemein' vorgenommen werden." UIHint="Error" />
                             </when>
                             <when default="true">
                               <ParameterSeparator Id="%AID%_PS-nnn" Text="Weather data by Open-Meteo.com (https://open-meteo.com/)&#10;&#10;Creative-Commons-Lizenz: Attribution 4.0 International (CC BY 4.0)&#10;Datenquellen und genaue Nutzungsbedingungen siehe https://open-meteo.com/en/license" UIHint="Information" />

@@ -51,9 +51,27 @@ neu parametrieren und die Gruppenadressen neu verknüpfen.
 * Fix: Ein neu angelegter Kanal ist standardmäßig "Deaktiviert" statt "Open-Meteo"
 
 
-# (upcoming) v0.5.1
+# (2026-08-18) v0.5.3
+
+* Fix: Build von v0.5.2 scheiterte
+* Automatisierter Build-Check
+* Doc Fix: Veraltete Version in Readme
+* Doc: Warnung vor blockierender Request Implementation
+
+
+# (2026-08-17) v0.5.2
+
+* Unterstützung von optionaler Einbindung in OAM
+  * Hinweis: Durch Setzen von `OPENKNX_INTERNETWEATHER_IGNORE` wird das Modul nicht in die Firmware integriert
+* Fix Typo/Refactor: "Wheather" to "Weather" Bezeichnern
+* Fix: Fehlender Version-Tag von Missing Version Definition
+* Fix: Missing Changelog-Entry (Rollback zu Old Changelog-Format)
+
+
+# v0.5.1
 
 * Fix: Open-Meteo API hatte die komplette Basis-URL überschrieben
+* Fix: KO Morning feels like temperature was filled with evening feels like temperature
 
 
 # (2026-02-17) v0.5.0 "Fix und KO-Benennung"

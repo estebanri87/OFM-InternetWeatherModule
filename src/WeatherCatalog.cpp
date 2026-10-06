@@ -1,3 +1,4 @@
+#ifndef OPENKNX_INTERNETWEATHER_IGNORE
 #include "WeatherCatalog.h"
 
 const WeatherMeasurandInfo* weatherMeasurand(uint8_t id)
@@ -61,3 +62,4 @@ const char* weatherMeasurandName(const WeatherMeasurandInfo& info)
     if (info.openweathermap.var != nullptr) return info.openweathermap.var;
     return "(abgeleitet)";
 }
+#endif

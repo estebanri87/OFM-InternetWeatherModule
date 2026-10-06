@@ -1,3 +1,4 @@
+#ifndef OPENKNX_INTERNETWEATHER_IGNORE
 #include "OpenMeteoChannel.h"
 #include "ArduinoJson.h"
 #include "HTTPClient.h"
@@ -180,3 +181,4 @@ int16_t OpenMeteoChannel::fetch(const WeatherRequest& request)
     delete[] values;
     return 200;
 }
+#endif

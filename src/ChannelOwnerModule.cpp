@@ -1,3 +1,4 @@
+#ifndef OPENKNX_INTERNETWEATHER_IGNORE
 #include "ChannelOwnerModule.h"
 
 IWChannelOwnerModule::IWChannelOwnerModule(uint8_t numberOfChannels)
@@ -220,4 +221,5 @@ void IWChannelOwnerModule::processInputKo(GroupObject &ko)
         }
     }
 }
+#endif
 #endif

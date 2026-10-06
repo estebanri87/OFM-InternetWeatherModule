@@ -510,7 +510,7 @@
 					</Static>
 					<Dynamic>
 						<Channel Name="MainChannel%TT%" Text="Internet Wetter" Number="%PREFIX%" Id="%AID%_CH-%TT%" Icon="weather-partly-cloudy">
-							<ParameterBlock Id="%AID%_PB-nnn" Name="WeatherSettings" Text="Basiseinstellungen" Icon="earth" HelpContext="Empty">
+							<ParameterBlock Id="%AID%_PB-nnn" Name="WeatherSettings" Text="Allgemein" Icon="cog-outline" HelpContext="Empty">
 
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Internet Wetter" UIHint="Headline" />
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Version: %ModuleVersion%" />
