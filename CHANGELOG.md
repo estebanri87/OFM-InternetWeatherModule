@@ -26,6 +26,17 @@ neu parametrieren und die Gruppenadressen neu verknüpfen.
 * Feature: Es ruft immer nur ein Kanal gleichzeitig ab, mit Mindestabstand und
   Startversatz nach dem Booten.
 * Feature: Suspendierte Kanäle werden in der Baumansicht gekennzeichnet.
+* Feature: Zwei zentrale Orte auf der neuen Seite "Position und Richtung". Der
+  Kanal wählt nur noch Gerätestandort, Ort 1 oder Ort 2; die Koordinaten je
+  Kanal entfallen.
+* Feature: Zeitbezug "heute um" für den Beginn und "heute um" bzw. "Tagesende"
+  für das Ende eines Intervalls, bei Stunden- und 15-Minuten-Werten. Nach
+  Mitternacht wird für solche Slots automatisch neu abgerufen.
+* Feature: Neue Aggregation "Spannbreite" (Maximum minus Minimum).
+* Feature: Windgeschwindigkeiten wahlweise in km/h (DPT 9.028) oder m/s
+  (DPT 9.005), einstellbar auf der Seite "Allgemein".
+* Feature: Modulweites Budget von 16 kB für die Zeitreihen aller Slots. Ein
+  Slot, der es überschreiten würde, bleibt aus und meldet das im Log.
 * Feature: Neuer Messwert-Katalog als einzige Pflegestelle
   (src/weather-catalog.json) samt Generator und Prüfskript gegen die Live-API.
 * Fix: Der Open-Meteo-API-Key wurde als "appid" statt "apikey" gesendet und war

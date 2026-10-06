@@ -56,7 +56,7 @@ const char* weatherLevelName(WeatherLevel level)
 
 const char* weatherMeasurandName(const WeatherMeasurandInfo& info)
 {
-    // Fuer die Diagnose reicht der Variablenname des Anbieters, der die Groesse
+    // Für die Diagnose reicht der Variablenname des Anbieters, der die Größe
     // liefert; abgeleitete Werte tragen keinen.
     if (info.openmeteo.var != nullptr) return info.openmeteo.var;
     if (info.openweathermap.var != nullptr) return info.openweathermap.var;

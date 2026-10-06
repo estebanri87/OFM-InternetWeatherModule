@@ -9,28 +9,29 @@ enum class WeatherProvider : uint8_t
     OpenMeteo = 2
 };
 
-// Ein Slot belegt 6 Byte im Kanalblock, Slot A beginnt bei Byte 9.
+// Drei Slots je Kanal. Die Slot-Parameter werden über die vom Producer für Slot A
+// erzeugten Makros adressiert (Byte, Maske, Shift); Slot B und C liegen um
+// IW_SLOT_STRIDE dahinter. So muss keine Bitposition von Hand gepflegt werden.
 #define IW_SLOT_COUNT 3
-#define IW_SLOT_BASE IW_CHSlotACategoryOpenmeteo
-#define IW_SLOT_STRIDE (IW_CHSlotBCategoryOpenmeteo - IW_CHSlotACategoryOpenmeteo)
+#define IW_SLOT_STRIDE (IW_CHSlotBMeasurand - IW_CHSlotAMeasurand)
 
-// Byte-Versatz der Slot-Parameter relativ zum Slot-Anfang
-#define IW_SLOT_OFF_FLAGS 0
-#define IW_SLOT_OFF_MEASURAND 1
-#define IW_SLOT_OFF_FROM 2
-#define IW_SLOT_OFF_TO 4
+// Liest ein Bitfeld eines Slot-Parameters, z.B. IW_SLOT_FIELD(ch, slot, ValueType).
+#define IW_SLOT_INDEX(channel, slot, field) \
+    (IW_ParamBlockOffset + (channel) * IW_ParamBlockSize + IW_CHSlotA##field + (slot) * IW_SLOT_STRIDE)
+#define IW_SLOT_FIELD(channel, slot, field) \
+    ((knx.paramByte(IW_SLOT_INDEX(channel, slot, field)) & IW_CHSlotA##field##Mask) >> IW_CHSlotA##field##Shift)
 
 // Liefert den Katalogeintrag zur Messwert-Id, oder nullptr bei unbekannter Id.
-// Faengt damit zugleich einen Restwert ab, der nach einem Kategorie- oder
+// Fängt damit zugleich einen Restwert ab, der nach einem Kategorie- oder
 // Anbieterwechsel im gemeinsamen Speicherbyte stehengeblieben ist.
 const WeatherMeasurandInfo* weatherMeasurand(uint8_t id);
 
 // Anbieter-Variable eines Messwerts, oder nullptr wenn dieser Anbieter die
-// Groesse nicht liefert.
+// Größe nicht liefert.
 const WeatherProviderVar* weatherProviderVar(const WeatherMeasurandInfo& info, WeatherProvider provider);
 
 // Rasterweite einer Zeitebene in Sekunden. Tageswerte liefern 0, weil ein
-// Kalendertag wegen der Zeitumstellung keine feste Laenge hat.
+// Kalendertag wegen der Zeitumstellung keine feste Länge hat.
 uint32_t weatherLevelSeconds(WeatherLevel level);
 
 const char* weatherLevelName(WeatherLevel level);

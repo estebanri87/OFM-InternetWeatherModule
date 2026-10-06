@@ -60,6 +60,17 @@ void BaseWeatherChannel::loop()
     const time_t now = time(nullptr);
     if (now < IW_TIME_VALID_FROM) return;
 
+    // Mit "heute um" oder "Tagesende" hängt das Fenster am Kalendertag. Nach
+    // Mitternacht deckt der Puffer den neuen Tag nicht ab, also neu abrufen.
+    struct tm tmLocal;
+    localtime_r(&now, &tmLocal);
+    if (_lastDay >= 0 && tmLocal.tm_yday != _lastDay)
+    {
+        for (uint8_t i = 0; i < IW_SLOT_COUNT; i++)
+            if (_slots[i].usesDayReference()) _fetchPending = true;
+    }
+    _lastDay = (int16_t)tmLocal.tm_yday;
+
     for (uint8_t i = 0; i < IW_SLOT_COUNT; i++)
         publishSlot(i, now);
 }
@@ -77,7 +88,7 @@ void BaseWeatherChannel::fetchNow()
     }
 
     WeatherRequest request;
-    buildRequest(request);
+    buildRequest(request, now);
     if (!request.any())
     {
         logDebugP("Kein Slot belegt, kein Abruf nötig");
@@ -138,29 +149,46 @@ void BaseWeatherChannel::addVar(WeatherLevelRequest& lr, const char* var) const
     lr.vars[lr.varCount++] = var;
 }
 
-void BaseWeatherChannel::buildRequest(WeatherRequest& request) const
+void BaseWeatherChannel::buildRequest(WeatherRequest& request, time_t now) const
 {
-    request.latitude = ParamIW_CHWeatherLocationType ? ParamIW_CHLatitude : ParamBASE_Latitude;
-    request.longitude = ParamIW_CHWeatherLocationType ? ParamIW_CHLongitude : ParamBASE_Longitude;
+    switch (ParamIW_CHLocation)
+    {
+        case PT_Location::Location1:
+            request.latitude = ParamIW_Location1Latitude;
+            request.longitude = ParamIW_Location1Longitude;
+            break;
+        case PT_Location::Location2:
+            request.latitude = ParamIW_Location2Latitude;
+            request.longitude = ParamIW_Location2Longitude;
+            break;
+        default:
+            request.latitude = ParamBASE_Latitude;
+            request.longitude = ParamBASE_Longitude;
+            break;
+    }
 
     for (uint8_t i = 0; i < IW_SLOT_COUNT; i++)
     {
         const WeatherSlot& slot = _slots[i];
         if (!slot.configured()) continue;
 
+        int16_t from = 0;
+        int16_t to = 0;
+        slot.need(now, from, to);
+
         WeatherLevelRequest& lr = request.levels[(uint8_t)slot.level()];
         if (!lr.used)
         {
             lr.used = true;
-            lr.from = slot.needFrom();
-            lr.to = slot.needTo();
+            lr.from = from;
+            lr.to = to;
         }
         else
         {
             // Ein Zeitfenster über die Vereinigung aller Slots dieser Ebene -
             // drei Slots auf derselben Größe kosten so keinen zweiten Abruf.
-            if (slot.needFrom() < lr.from) lr.from = slot.needFrom();
-            if (slot.needTo() > lr.to) lr.to = slot.needTo();
+            if (from < lr.from) lr.from = from;
+            if (to > lr.to) lr.to = to;
         }
 
         if (slot.info()->dpt == WeatherDpt::Dpt16_1)
@@ -196,8 +224,10 @@ void BaseWeatherChannel::applySeries(WeatherLevel level, const char* var, const 
         if (times[i] <= now) current = (int32_t)i;
         else break;
     }
-    if (current < 0) return;
-    const int32_t idx = current + textSlot.needFrom();
+    int32_t first = 0;
+    int32_t last = 0;
+    if (current < 0 || !textSlot.window(now, first, last)) return;
+    const int32_t idx = current + first;
     if (idx < 0 || idx >= (int32_t)count) return;
 
     if (textHelperVar(0) != nullptr && strcmp(var, textHelperVar(0)) == 0) _textRain = values[idx];
@@ -234,7 +264,10 @@ void BaseWeatherChannel::buildWeatherText(char* target, uint8_t slotIndex, time_
     else
         snprintf(body, sizeof(body), "%s", ParamIW_TextSunStr.c_str());
 
-    const std::string prefix = (_slots[slotIndex].needFrom() == 0) ? ParamIW_TextPrefixDayCurrentStr : ParamIW_TextPrefixDayNextStr;
+    int32_t first = 0;
+    int32_t last = 0;
+    _slots[slotIndex].window(now, first, last);
+    const std::string prefix = (first == 0) ? ParamIW_TextPrefixDayCurrentStr : ParamIW_TextPrefixDayNextStr;
     snprintf(target, 15, "%s%s", prefix.c_str(), body);
 }
 
@@ -269,7 +302,13 @@ void BaseWeatherChannel::publishSlot(uint8_t slotIndex, time_t now)
         case WeatherDpt::Dpt9_7: ko.value(value, DPT_Value_Humidity); break;
         case WeatherDpt::Dpt9_22: ko.value(value, Dpt(9, 22)); break;
         case WeatherDpt::Dpt9_26: ko.value(value, DPT_Rain_Amount); break;
-        case WeatherDpt::Dpt9_28: ko.value(value, DPT_Value_Wsp_kmh); break;
+        case WeatherDpt::Dpt9_28:
+            // Die ETS stellt das KO bei m/s auf DPT 9.005 um, der Katalog rechnet in km/h.
+            if (ParamIW_WindSpeedUnit == PT_WindSpeedUnit::Ms)
+                ko.value(value / 3.6f, DPT_Value_Wsp);
+            else
+                ko.value(value, DPT_Value_Wsp_kmh);
+            break;
         case WeatherDpt::Dpt9_31: ko.value(value, DPT_Value_Tempd); break;
         case WeatherDpt::Dpt5_1: ko.value((uint8_t)lroundf(value), DPT_Scaling); break;
         case WeatherDpt::Dpt5_3: ko.value((uint8_t)lroundf(value), DPT_Angle); break;
@@ -312,7 +351,9 @@ void BaseWeatherChannel::logSlots()
     for (uint8_t i = 0; i < IW_SLOT_COUNT; i++)
     {
         _slots[i].describe(line, sizeof(line), i);
-        if (_slots[i].unsupported())
+        if (_slots[i].overBudget())
+            logErrorP("%s", line);
+        else if (_slots[i].unsupported())
             logWarningP("%s", line);
         else
             logInfoP("%s", line);

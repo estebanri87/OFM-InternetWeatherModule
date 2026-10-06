@@ -61,7 +61,7 @@ std::string OpenMeteoChannel::buildUrl(const WeatherRequest& request) const
     url += "&longitude=" + std::to_string(request.longitude);
 
     // Open-Meteo erwartet den Schlüssel als "apikey"; frühere Versionen sendeten
-    // faelschlich "appid", der Schluessel blieb dadurch wirkungslos.
+    // fälschlich "appid", der Schlüssel blieb dadurch wirkungslos.
     if (ParamIW_OpenMeteo_UsageLicense == 2)
     {
         const std::string key = ParamIW_OpenMeteo_APIKeyStr;

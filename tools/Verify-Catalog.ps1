@@ -77,7 +77,7 @@ Write-Host ''
 if ([string]::IsNullOrWhiteSpace($OwmApiKey))
 {
     $owmCount = @($catalog.measurements | Where-Object { Get-ProviderVar $_ 'openweathermap' }).Count
-    Write-Host ("OpenWeatherMap: {0} Messwerte nicht geprüft - kein API-Key uebergeben (-OwmApiKey)." -f $owmCount) -ForegroundColor Yellow
+    Write-Host ("OpenWeatherMap: {0} Messwerte nicht geprüft - kein API-Key übergeben (-OwmApiKey)." -f $owmCount) -ForegroundColor Yellow
 }
 else
 {

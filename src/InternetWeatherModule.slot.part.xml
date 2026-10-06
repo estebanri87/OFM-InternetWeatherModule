@@ -11,14 +11,22 @@
               <!-- Bezeichnung: kein Union, keine Memory -> nur in der ETS, nicht auf dem Gerät -->
               <Parameter Id="%AID%_P-%TT%%CC%%SPP+0%" Name="CH%C%Slot%SL%Label" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />
 
-              <Union SizeInBit="48">
+              <!-- Slot, 7 Byte:
+                   Byte +0    Bits 7-4 Kategorie, Bit 3 Typ, Bit 2 Senden, Bit 1 Zeitbezug Offset
+                   Byte +1    Messwert
+                   Byte +2/+3 Offset bzw. Uhrzeit
+                   Byte +4/+5 bis Offset bzw. Uhrzeit
+                   Byte +6    Bits 7-5 Aggregation, Bits 4-3 Zeitbezug bis Offset -->
+              <Union SizeInBit="56">
                 <Memory CodeSegment="%MID%" Offset="%SO%" BitOffset="0" />
                 <!-- Byte +0 Bit 7-4: Kategorie, je Anbieter eine Sicht auf dieselbe Stelle -->
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+4%" Name="CH%C%Slot%SL%CategoryOpenweathermap" ParameterType="%AID%_PT-IWCategoryOpenweathermap" Offset="0" BitOffset="0" Text="Kategorie" Value="0" op:nowarn="true" />
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+5%" Name="CH%C%Slot%SL%CategoryOpenmeteo" ParameterType="%AID%_PT-IWCategoryOpenmeteo" Offset="0" BitOffset="0" Text="Kategorie" Value="0" op:nowarn="true" />
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+1%" Name="CH%C%Slot%SL%ValueType"   ParameterType="%AID%_PT-IWSlotValueType" Offset="0" BitOffset="4" Text="Typ" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+2%" Name="CH%C%Slot%SL%Aggregation" ParameterType="%AID%_PT-IWAggregation"   Offset="0" BitOffset="5" Text="Aggregation" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+3%" Name="CH%C%Slot%SL%Send"        ParameterType="%AID%_PT-IWSendBehaviour" Offset="0" BitOffset="7" Text="Senden" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+3%" Name="CH%C%Slot%SL%Send"        ParameterType="%AID%_PT-IWSendBehaviour" Offset="0" BitOffset="5" Text="Senden" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+6%" Name="CH%C%Slot%SL%FromRef"     ParameterType="%AID%_PT-IWFromRef"       Offset="0" BitOffset="6" Text="Zeitbezug" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+2%" Name="CH%C%Slot%SL%Aggregation" ParameterType="%AID%_PT-IWAggregation"   Offset="6" BitOffset="0" Text="Aggregation" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+7%" Name="CH%C%Slot%SL%ToRef"       ParameterType="%AID%_PT-IWToRef"         Offset="6" BitOffset="3" Text="Ende" Value="0" />
 
                 <!-- Byte +1: gefilterte Messwert-Sichten je Anbieter und Kategorie -->
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+10%" Name="CH%C%Slot%SL%MeasurandOpenweathermapUebersicht" ParameterType="%AID%_PT-IWMeasurandOpenweathermapUebersicht" Offset="1" BitOffset="0" Text="Messwert" Value="0" op:nowarn="true" />
@@ -51,6 +59,9 @@
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+37%" Name="CH%C%Slot%SL%OffsetToOpenmeteoHour"   ParameterType="%AID%_PT-IWOffsetOpenmeteoHour" Offset="4" BitOffset="0" Text="bis Offset" SuffixText="Stunden" Value="0" op:nowarn="true" />
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+32%" Name="CH%C%Slot%SL%OffsetFromOpenmeteoDay" ParameterType="%AID%_PT-IWOffsetOpenmeteoDay" Offset="2" BitOffset="0" Text="Offset" SuffixText="Tage" Value="0" op:nowarn="true" />
                 <Parameter Id="%AID%_UP-%TT%%CC%%SPP+38%" Name="CH%C%Slot%SL%OffsetToOpenmeteoDay"   ParameterType="%AID%_PT-IWOffsetOpenmeteoDay" Offset="4" BitOffset="0" Text="bis Offset" SuffixText="Tage" Value="0" op:nowarn="true" />
+                <!-- Uhrzeit bei Zeitbezug "heute um", auf denselben Bytes wie die Offsets -->
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+8%" Name="CH%C%Slot%SL%HourFrom" ParameterType="%AID%_PT-IWHourOfDay" Offset="2" BitOffset="0" Text="Uhrzeit" SuffixText="Uhr" Value="0" op:nowarn="true" />
+                <Parameter Id="%AID%_UP-%TT%%CC%%SPP+9%" Name="CH%C%Slot%SL%HourTo"   ParameterType="%AID%_PT-IWHourOfDay" Offset="4" BitOffset="0" Text="bis Uhrzeit" SuffixText="Uhr" Value="0" op:nowarn="true" />
               </Union>
             </Parameters>
 
@@ -61,6 +72,10 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+3%_R-%TT%%CC%%SPP+3%01" RefId="%AID%_UP-%TT%%CC%%SPP+3%" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+4%_R-%TT%%CC%%SPP+4%01" RefId="%AID%_UP-%TT%%CC%%SPP+4%" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+5%_R-%TT%%CC%%SPP+5%01" RefId="%AID%_UP-%TT%%CC%%SPP+5%" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" RefId="%AID%_UP-%TT%%CC%%SPP+6%" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01" RefId="%AID%_UP-%TT%%CC%%SPP+7%" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" RefId="%AID%_UP-%TT%%CC%%SPP+8%" />
+              <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+9%_R-%TT%%CC%%SPP+9%01" RefId="%AID%_UP-%TT%%CC%%SPP+9%" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+10%_R-%TT%%CC%%SPP+10%01" RefId="%AID%_UP-%TT%%CC%%SPP+10%" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+11%_R-%TT%%CC%%SPP+11%01" RefId="%AID%_UP-%TT%%CC%%SPP+11%" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%%SPP+12%_R-%TT%%CC%%SPP+12%01" RefId="%AID%_UP-%TT%%CC%%SPP+12%" />
@@ -145,6 +160,10 @@
               <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%48" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-31" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, UV-Index Maximum" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%49" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-26" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, ET0 Referenz-Verdunstung" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
               <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%50" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-26" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, ET0 Referenz-Verdunstung Summe" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%51" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-5" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, Windgeschwindigkeit (10 m)" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%52" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-5" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, Windgeschwindigkeit Maximum" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%53" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-5" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, Windböen (10 m)" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
+              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%54" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="2 Bytes" DatapointType="DPST-9-5" Text="{{0:Wert %SL%}}" FunctionText="Wetter %C% %SL%: Ausgang, Windböen Maximum" TextParameterRefId="%AID%_P-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%01" />
             </ComObjectRefs>
           </Static>
 
@@ -197,14 +216,26 @@
                         <when test="6 12 22 31 42 45 48 52 56 60 76 80 82 91 119">
                           <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+26%_R-%TT%%CC%%SPP+26%01">
                             <when test="6 60">
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+28%_R-%TT%%CC%%SPP+28%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+28%_R-%TT%%CC%%SPP+28%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                             </when>
                             <when default="true">
                               <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01" HelpContext="IW-SlotTyp" />
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+28%_R-%TT%%CC%%SPP+28%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+28%_R-%TT%%CC%%SPP+28%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                               <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01">
                                 <when test="1">
-                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+34%_R-%TT%%CC%%SPP+34%01" HelpContext="IW-SlotOffsetBis" />
+                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01" HelpContext="IW-SlotEnde" />
+                                  <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01">
+                                    <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+34%_R-%TT%%CC%%SPP+34%01" HelpContext="IW-SlotOffsetBis" /></when>
+                                    <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+9%_R-%TT%%CC%%SPP+9%01" HelpContext="IW-SlotUhrzeit" /></when>
+                                  </choose>
                                   <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+2%_R-%TT%%CC%%SPP+2%01" HelpContext="IW-SlotAggregation" />
                                 </when>
                               </choose>
@@ -273,14 +304,26 @@
                         <when test="11 21 41 51 55 59 71 75 79 110 112 114 116">
                           <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+26%_R-%TT%%CC%%SPP+26%01">
                             <when test="59">
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+30%_R-%TT%%CC%%SPP+30%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+30%_R-%TT%%CC%%SPP+30%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                             </when>
                             <when default="true">
                               <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01" HelpContext="IW-SlotTyp" />
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+30%_R-%TT%%CC%%SPP+30%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+30%_R-%TT%%CC%%SPP+30%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                               <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01">
                                 <when test="1">
-                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+36%_R-%TT%%CC%%SPP+36%01" HelpContext="IW-SlotOffsetBis" />
+                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01" HelpContext="IW-SlotEnde" />
+                                  <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01">
+                                    <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+36%_R-%TT%%CC%%SPP+36%01" HelpContext="IW-SlotOffsetBis" /></when>
+                                    <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+9%_R-%TT%%CC%%SPP+9%01" HelpContext="IW-SlotUhrzeit" /></when>
+                                  </choose>
                                   <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+2%_R-%TT%%CC%%SPP+2%01" HelpContext="IW-SlotAggregation" />
                                 </when>
                               </choose>
@@ -290,14 +333,26 @@
                         <when test="3 12 22 31 42 45 52 56 60 72 76 80 82 91 93 111 113 115 117 119 130">
                           <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+26%_R-%TT%%CC%%SPP+26%01">
                             <when test="3 60">
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+31%_R-%TT%%CC%%SPP+31%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+31%_R-%TT%%CC%%SPP+31%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                             </when>
                             <when default="true">
                               <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01" HelpContext="IW-SlotTyp" />
-                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+31%_R-%TT%%CC%%SPP+31%01" HelpContext="IW-SlotOffset" />
+                              <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01" HelpContext="IW-SlotZeitbezug" />
+                              <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+6%_R-%TT%%CC%%SPP+6%01">
+                                <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+31%_R-%TT%%CC%%SPP+31%01" HelpContext="IW-SlotOffset" /></when>
+                                <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+8%_R-%TT%%CC%%SPP+8%01" HelpContext="IW-SlotUhrzeit" /></when>
+                              </choose>
                               <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+1%_R-%TT%%CC%%SPP+1%01">
                                 <when test="1">
-                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+37%_R-%TT%%CC%%SPP+37%01" HelpContext="IW-SlotOffsetBis" />
+                                  <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01" HelpContext="IW-SlotEnde" />
+                                  <choose ParamRefId="%AID%_UP-%TT%%CC%%SPP+7%_R-%TT%%CC%%SPP+7%01">
+                                    <when test="0"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+37%_R-%TT%%CC%%SPP+37%01" HelpContext="IW-SlotOffsetBis" /></when>
+                                    <when test="1"><ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+9%_R-%TT%%CC%%SPP+9%01" HelpContext="IW-SlotUhrzeit" /></when>
+                                  </choose>
                                   <ParameterRefRef RefId="%AID%_UP-%TT%%CC%%SPP+2%_R-%TT%%CC%%SPP+2%01" HelpContext="IW-SlotAggregation" />
                                 </when>
                               </choose>
@@ -403,16 +458,28 @@
                       <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%23" />   <!-- Sichtweite, DPST-7-1 -->
                     </when>
                     <when test="50 51 52">
-                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%24" />   <!-- Windgeschwindigkeit (10 m), DPST-9-28 -->
+                      <choose ParamRefId="%AID%_UP-%TT%00030_R-%TT%0003001">   <!-- globale Windeinheit -->
+                        <when test="0"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%24" /></when>   <!-- Windgeschwindigkeit (10 m), km/h -->
+                        <when test="1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%51" /></when>   <!-- Windgeschwindigkeit (10 m), m/s -->
+                      </choose>
                     </when>
                     <when test="53">
-                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%25" />   <!-- Windgeschwindigkeit Maximum, DPST-9-28 -->
+                      <choose ParamRefId="%AID%_UP-%TT%00030_R-%TT%0003001">   <!-- globale Windeinheit -->
+                        <when test="0"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%25" /></when>   <!-- Windgeschwindigkeit Maximum, km/h -->
+                        <when test="1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%52" /></when>   <!-- Windgeschwindigkeit Maximum, m/s -->
+                      </choose>
                     </when>
                     <when test="54 55 56">
-                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%26" />   <!-- Windböen (10 m), DPST-9-28 -->
+                      <choose ParamRefId="%AID%_UP-%TT%00030_R-%TT%0003001">   <!-- globale Windeinheit -->
+                        <when test="0"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%26" /></when>   <!-- Windböen (10 m), km/h -->
+                        <when test="1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%53" /></when>   <!-- Windböen (10 m), m/s -->
+                      </choose>
                     </when>
                     <when test="57">
-                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%27" />   <!-- Windböen Maximum, DPST-9-28 -->
+                      <choose ParamRefId="%AID%_UP-%TT%00030_R-%TT%0003001">   <!-- globale Windeinheit -->
+                        <when test="0"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%27" /></when>   <!-- Windböen Maximum, km/h -->
+                        <when test="1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%54" /></when>   <!-- Windböen Maximum, m/s -->
+                      </choose>
                     </when>
                     <when test="58 59 60">
                       <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%28" />   <!-- Windrichtung (10 m), DPST-5-3 -->

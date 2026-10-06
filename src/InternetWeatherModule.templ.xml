@@ -11,12 +11,12 @@
                Wert-Slots (Wetter A/B/C). Das Fragment wird einmal gepflegt und
                vom Producer dreimal expandiert.
                  %SL%  Slot-Buchstabe A/B/C
-                 %SO%  Byte-Offset des Slots im Kanalblock (9 / 15 / 21)
+                 %SO%  Byte-Offset des Slots im Kanalblock (1 / 8 / 15)
                  %SPP% Basis der Parameter-IDs des Slots (100 / 140 / 180)
                  %SK%  KO-Index des Slots innerhalb des Kanals (1 / 2 / 3) -->
           <op:part name="SLOT" href="InternetWeatherModule.slot.part.xml" instances="3">
             <op:param name="%SL%"  value="0"   increment="1"  asLetter="true" />
-            <op:param name="%SO%"  value="9"   increment="6" />
+            <op:param name="%SO%"  value="1"   increment="7" />
             <op:param name="%SPP%" value="100" increment="40" digits="3" />
             <op:param name="%SK%"  value="1"   increment="1" />
           </op:part>
@@ -26,16 +26,13 @@
               <!-- Beschreibung: kein Union, keine Memory -> nur in der ETS, nicht auf dem Gerät -->
               <Parameter Id="%AID%_P-%TT%%CC%000" Name="Channel%C%Name" ParameterType="%AID%_PT-Text40Byte" Text="Beschreibung" Value="" />
 
-              <!-- Kanalkopf, 9 Byte:
-                   Byte 0   Bit 3-0 Wetter-Service, Bit 4 Suspendiert, Bit 5 Ortswahl
-                   Byte 1-4 Latitude, Byte 5-8 Longitude -->
-              <Union SizeInBit="72">
+              <!-- Kanalkopf, 1 Byte: Bits 7-4 Wetter-Service, Bit 3 Suspendiert, Bits 2-1 Ort.
+                   Die Koordinaten der Orte stehen zentral auf der Seite "Position und Richtung". -->
+              <Union SizeInBit="8">
                 <Memory CodeSegment="%MID%" Offset="0" BitOffset="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%001" Name="CH%C%WeatherChannelType"  ParameterType="%AID%_PT-WeatherChannelType"  Offset="0" BitOffset="0" Text="Wetter-Service" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%002" Name="CH%C%Suspended"           ParameterType="%AID%_PT-Suspended"           Offset="0" BitOffset="4" Text="Suspendiert" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%003" Name="CH%C%WeatherLocationType" ParameterType="%AID%_PT-WeatherLocationType" Offset="0" BitOffset="5" Text="Ort" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%004" Name="CH%C%Latitude"            ParameterType="%AID%_PT-Latitude"            Offset="1" BitOffset="0" Text="Breitengrad" Value="0" />
-                <Parameter Id="%AID%_UP-%TT%%CC%005" Name="CH%C%Longitude"           ParameterType="%AID%_PT-Longitude"           Offset="5" BitOffset="0" Text="Längengrad" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%001" Name="CH%C%WeatherChannelType" ParameterType="%AID%_PT-WeatherChannelType" Offset="0" BitOffset="0" Text="Wetter-Service" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%002" Name="CH%C%Suspended"          ParameterType="%AID%_PT-Suspended"          Offset="0" BitOffset="4" Text="Suspendiert" Value="0" />
+                <Parameter Id="%AID%_UP-%TT%%CC%003" Name="CH%C%Location"           ParameterType="%AID%_PT-IWLocation"         Offset="0" BitOffset="5" Text="Ort" Value="0" />
               </Union>
 
               <!-- TypeSelect: kein Union, keine Memory-Referenz -> nur in der ETS gespeichert.
@@ -55,8 +52,6 @@
               <ParameterRef Id="%AID%_UP-%TT%%CC%001_R-%TT%%CC%00101" RefId="%AID%_UP-%TT%%CC%001" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%002_R-%TT%%CC%00201" RefId="%AID%_UP-%TT%%CC%002" />
               <ParameterRef Id="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" RefId="%AID%_UP-%TT%%CC%003" />
-              <ParameterRef Id="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" RefId="%AID%_UP-%TT%%CC%004" />
-              <ParameterRef Id="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" RefId="%AID%_UP-%TT%%CC%005" />
               <ParameterRef Id="%AID%_P-%TT%%CC%997_R-%TT%%CC%99701" RefId="%AID%_P-%TT%%CC%997" />
               <ParameterRef Id="%AID%_P-%TT%%CC%998_R-%TT%%CC%99801" RefId="%AID%_P-%TT%%CC%998" />
 
@@ -156,13 +151,7 @@
                       </choose>
 
                       <!-- Standort -->
-                      <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" HelpContext="IW-WeatherLocationType" />
-                      <choose ParamRefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301">
-                        <when test="1">
-                          <ParameterRefRef RefId="%AID%_UP-%TT%%CC%004_R-%TT%%CC%00401" IndentLevel="1" HelpContext="IW-Latitude" />
-                          <ParameterRefRef RefId="%AID%_UP-%TT%%CC%005_R-%TT%%CC%00501" IndentLevel="1" HelpContext="IW-Longitude" />
-                        </when>
-                      </choose>
+                      <ParameterRefRef RefId="%AID%_UP-%TT%%CC%003_R-%TT%%CC%00301" HelpContext="IW-Ort" />
 
                       <!-- Diagnose -->
                       <ComObjectRefRef RefId="%AID%_O-%TT%%CC%000_R-%TT%%CC%00001" />

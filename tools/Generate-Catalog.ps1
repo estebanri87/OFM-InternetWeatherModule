@@ -32,6 +32,8 @@ $nl = "`r`n"
 $slotIds = @{
     Label = 0; ValueType = 1; Aggregation = 2; Send = 3
     CategoryBase = 4          #  +4 .. +5    je Anbieter
+    FromRef = 6; ToRef = 7    # Zeitbezug von Offset und bis Offset
+    HourFrom = 8; HourTo = 9  # Uhrzeit bei Zeitbezug "heute um"
     MeasurandBase = 10        # +10 .. +25   je Anbieter (8er-Block) und Kategorie
     Shadow = 26
     OffsetFromBase = 27       # +27 .. +32   je Anbieter (3er-Block) und Zeitebene
@@ -203,7 +205,7 @@ Add '                </TypeRestriction>'
 Add '              </ParameterType>'
 Add ''
 Add '              <ParameterType Id="%AID%_PT-IWAggregation" Name="IWAggregation" op:headerExport="enum" op:headerName="Aggregation">'
-Add '                <TypeRestriction Base="Value" SizeInBit="2" UIHint="DropDown">'
+Add '                <TypeRestriction Base="Value" SizeInBit="3" UIHint="DropDown">'
 foreach ($a in $catalog.aggregations)
 {
     Add ('                  <Enumeration Text="{0}" Value="{1}" Id="%ENID%" op:headerName="{2}" />' -f (Protect-Xml $a.label), $a.value, (ConvertTo-Identifier $a.key))
@@ -216,6 +218,25 @@ Add '                <TypeRestriction Base="Value" SizeInBit="1">'
 Add '                  <Enumeration Text="Nur bei Änderung" Value="0" Id="%ENID%" op:headerName="OnChange" />'
 Add '                  <Enumeration Text="Bei jedem Abruf" Value="1" Id="%ENID%" op:headerName="Always" />'
 Add '                </TypeRestriction>'
+Add '              </ParameterType>'
+Add ''
+
+# Zeitbezug, nur bei Stunden- und 15-Minuten-Werten angeboten.
+Add '              <ParameterType Id="%AID%_PT-IWFromRef" Name="IWFromRef" op:headerExport="enum" op:headerName="FromRef">'
+Add '                <TypeRestriction Base="Value" SizeInBit="1">'
+Add '                  <Enumeration Text="relativ zu jetzt" Value="0" Id="%ENID%" op:headerName="Relative" />'
+Add '                  <Enumeration Text="heute um" Value="1" Id="%ENID%" op:headerName="TodayAt" />'
+Add '                </TypeRestriction>'
+Add '              </ParameterType>'
+Add '              <ParameterType Id="%AID%_PT-IWToRef" Name="IWToRef" op:headerExport="enum" op:headerName="ToRef">'
+Add '                <TypeRestriction Base="Value" SizeInBit="2" UIHint="DropDown">'
+Add '                  <Enumeration Text="relativ zu jetzt" Value="0" Id="%ENID%" op:headerName="Relative" />'
+Add '                  <Enumeration Text="heute um" Value="1" Id="%ENID%" op:headerName="TodayAt" />'
+Add '                  <Enumeration Text="Tagesende" Value="2" Id="%ENID%" op:headerName="EndOfDay" />'
+Add '                </TypeRestriction>'
+Add '              </ParameterType>'
+Add '              <ParameterType Id="%AID%_PT-IWHourOfDay" Name="IWHourOfDay">'
+Add '                <TypeNumber SizeInBit="16" Type="signedInt" minInclusive="0" maxInclusive="23" />'
 Add '              </ParameterType>'
 Add ''
 
@@ -263,6 +284,44 @@ function MeasurandId([string] $pk, [string] $ck)  { $slotIds.MeasurandBase + $pr
 function OffsetFromId([string] $pk, [string] $lk) { $slotIds.OffsetFromBase + $provIndex[$pk] * 3 + [array]::IndexOf($offsetLevelOrder, $lk) }
 function OffsetToId([string] $pk, [string] $lk)   { $slotIds.OffsetToBase   + $provIndex[$pk] * 3 + [array]::IndexOf($offsetLevelOrder, $lk) }
 
+# Windeinheit: der Katalog führt Wind in km/h, die globale Einstellung kann auf m/s umstellen.
+$windKmhDpt  = 'DPST-9-28'
+$windMsDpt   = 'DPST-9-5'
+$windUnitRef = '%AID%_UP-%TT%00030_R-%TT%0003001'
+
+# Zeitebenen mit Zeitbezug "heute um" / "Tagesende". Tageswerte bleiben relativ.
+$timeRefLevels = @('hourly', 'minutely_15')
+
+# Beginn des Fensters: Offset oder, bei Zeitbezug "heute um", eine Uhrzeit.
+function Add-FromFields([string] $ind, [string] $offFrom, [bool] $withRef)
+{
+    if (-not $withRef)
+    {
+        AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffset" />' -f $offFrom))
+        return
+    }
+    AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotZeitbezug" />' -f (UpRef $slotIds.FromRef)))
+    AddS ($ind + ('<choose ParamRefId="{0}">' -f (UpRef $slotIds.FromRef)))
+    AddS ($ind + ('  <when test="0"><ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffset" /></when>' -f $offFrom))
+    AddS ($ind + ('  <when test="1"><ParameterRefRef RefId="{0}" HelpContext="IW-SlotUhrzeit" /></when>' -f (UpRef $slotIds.HourFrom)))
+    AddS ($ind + '</choose>')
+}
+
+# Ende des Fensters: Offset, Uhrzeit oder Tagesende (ohne Zahlenfeld).
+function Add-ToFields([string] $ind, [string] $offTo, [bool] $withRef)
+{
+    if (-not $withRef)
+    {
+        AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffsetBis" />' -f $offTo))
+        return
+    }
+    AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotEnde" />' -f (UpRef $slotIds.ToRef)))
+    AddS ($ind + ('<choose ParamRefId="{0}">' -f (UpRef $slotIds.ToRef)))
+    AddS ($ind + ('  <when test="0"><ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffsetBis" /></when>' -f $offTo))
+    AddS ($ind + ('  <when test="1"><ParameterRefRef RefId="{0}" HelpContext="IW-SlotUhrzeit" /></when>' -f (UpRef $slotIds.HourTo)))
+    AddS ($ind + '</choose>')
+}
+
 AddS '<?xml version="1.0" encoding="utf-8"?>'
 AddS '<KNX xmlns:op="http://github.com/OpenKNX/OpenKNXproducer" xmlns="http://knx.org/xml/project/14" CreatedBy="KNX MT" ToolVersion="5.1.255.16695">'
 AddS '  <ManufacturerData>'
@@ -277,7 +336,13 @@ AddS '            <Parameters>'
 AddS '              <!-- Bezeichnung: kein Union, keine Memory -> nur in der ETS, nicht auf dem Gerät -->'
 AddS ('              <Parameter Id="%AID%_P-%TT%%CC%%SPP+{0}%" Name="CH%C%Slot%SL%Label" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />' -f $slotIds.Label)
 AddS ''
-AddS '              <Union SizeInBit="48">'
+AddS '              <!-- Slot, 7 Byte:'
+AddS '                   Byte +0    Bits 7-4 Kategorie, Bit 3 Typ, Bit 2 Senden, Bit 1 Zeitbezug Offset'
+AddS '                   Byte +1    Messwert'
+AddS '                   Byte +2/+3 Offset bzw. Uhrzeit'
+AddS '                   Byte +4/+5 bis Offset bzw. Uhrzeit'
+AddS '                   Byte +6    Bits 7-5 Aggregation, Bits 4-3 Zeitbezug bis Offset -->'
+AddS '              <Union SizeInBit="56">'
 AddS '                <Memory CodeSegment="%MID%" Offset="%SO%" BitOffset="0" />'
 AddS '                <!-- Byte +0 Bit 7-4: Kategorie, je Anbieter eine Sicht auf dieselbe Stelle -->'
 foreach ($p in $catalog.providers)
@@ -286,8 +351,10 @@ foreach ($p in $catalog.providers)
         (UpId (CategoryId $p.key)), (ConvertTo-Identifier $p.key))
 }
 AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%ValueType"   ParameterType="%AID%_PT-IWSlotValueType" Offset="0" BitOffset="4" Text="Typ" Value="0" />' -f (UpId $slotIds.ValueType))
-AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%Aggregation" ParameterType="%AID%_PT-IWAggregation"   Offset="0" BitOffset="5" Text="Aggregation" Value="0" />' -f (UpId $slotIds.Aggregation))
-AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%Send"        ParameterType="%AID%_PT-IWSendBehaviour" Offset="0" BitOffset="7" Text="Senden" Value="0" />' -f (UpId $slotIds.Send))
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%Send"        ParameterType="%AID%_PT-IWSendBehaviour" Offset="0" BitOffset="5" Text="Senden" Value="0" />' -f (UpId $slotIds.Send))
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%FromRef"     ParameterType="%AID%_PT-IWFromRef"       Offset="0" BitOffset="6" Text="Zeitbezug" Value="0" />' -f (UpId $slotIds.FromRef))
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%Aggregation" ParameterType="%AID%_PT-IWAggregation"   Offset="6" BitOffset="0" Text="Aggregation" Value="0" />' -f (UpId $slotIds.Aggregation))
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%ToRef"       ParameterType="%AID%_PT-IWToRef"         Offset="6" BitOffset="3" Text="Ende" Value="0" />' -f (UpId $slotIds.ToRef))
 AddS ''
 AddS '                <!-- Byte +1: gefilterte Messwert-Sichten je Anbieter und Kategorie -->'
 foreach ($p in $catalog.providers)
@@ -315,11 +382,15 @@ foreach ($p in $catalog.providers)
             (UpId (OffsetToId $p.key $l.key)), $tid, $l.unitText)
     }
 }
+AddS '                <!-- Uhrzeit bei Zeitbezug "heute um", auf denselben Bytes wie die Offsets -->'
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%HourFrom" ParameterType="%AID%_PT-IWHourOfDay" Offset="2" BitOffset="0" Text="Uhrzeit" SuffixText="Uhr" Value="0" op:nowarn="true" />' -f (UpId $slotIds.HourFrom))
+AddS ('                <Parameter Id="{0}" Name="CH%C%Slot%SL%HourTo"   ParameterType="%AID%_PT-IWHourOfDay" Offset="4" BitOffset="0" Text="bis Uhrzeit" SuffixText="Uhr" Value="0" op:nowarn="true" />' -f (UpId $slotIds.HourTo))
 AddS '              </Union>'
 AddS '            </Parameters>'
 AddS ''
 
-$unionIds = @($slotIds.ValueType, $slotIds.Aggregation, $slotIds.Send, $slotIds.Shadow)
+$unionIds = @($slotIds.ValueType, $slotIds.Aggregation, $slotIds.Send, $slotIds.Shadow,
+              $slotIds.FromRef, $slotIds.ToRef, $slotIds.HourFrom, $slotIds.HourTo)
 foreach ($p in $catalog.providers)
 {
     $unionIds += (CategoryId $p.key)
@@ -351,6 +422,19 @@ for ($i = 0; $i -lt $refOrder.Count; $i++)
     AddS ('              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="{1}" DatapointType="{2}" Text="{{{{0:Wert %SL%}}}}" FunctionText="Wetter %C% %SL%: Ausgang, {3}" TextParameterRefId="{4}" />' -f `
         ($i + 1), $size, $dpt, (Protect-Xml $label), (PRef $slotIds.Label))
 }
+# Windgeschwindigkeiten zusätzlich in m/s (DPT 9.005), je nach globaler Windeinheit.
+$refIndexMs = @{}
+$next = $refOrder.Count + 1
+foreach ($key in $refOrder)
+{
+    $label, $dpt, $size = $key -split '\|'
+    if ($dpt -ne $windKmhDpt) { continue }
+    $refIndexMs[$key] = $next
+    AddS ('              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="{1}" DatapointType="{2}" Text="{{{{0:Wert %SL%}}}}" FunctionText="Wetter %C% %SL%: Ausgang, {3}" TextParameterRefId="{4}" />' -f `
+        $next, $size, $windMsDpt, (Protect-Xml $label), (PRef $slotIds.Label))
+    $next++
+}
+if ($next - 1 -gt 99) { throw "Mehr als 99 KO-Varianten je Slot - die Ref-Id ist zweistellig." }
 AddS '            </ComObjectRefs>'
 AddS '          </Static>'
 AddS ''
@@ -393,22 +477,24 @@ foreach ($p in $catalog.providers)
         $nonAgg = @($byProvLvl["$($p.key)|$($l.key)"] | Where-Object { -not $_.aggregatable } | ForEach-Object { $_.id })
         $offFrom = UpRef (OffsetFromId $p.key $l.key)
         $offTo   = UpRef (OffsetToId $p.key $l.key)
+        # Zeitbezug "heute um" / "Tagesende" gibt es nur bei Stunden- und 15-Minuten-Werten.
+        $withRef = $timeRefLevels -contains $l.key
         AddS ('                        <when test="{0}">' -f (Format-TestList $ids))
         if ($nonAgg.Count -gt 0)
         {
             AddS ('                          <choose ParamRefId="{0}">' -f (UpRef $slotIds.Shadow))
             AddS ('                            <when test="{0}">' -f (Format-TestList $nonAgg))
-            AddS ('                              <ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffset" />' -f $offFrom)
+            Add-FromFields '                              ' $offFrom $withRef
             AddS '                            </when>'
             AddS '                            <when default="true">'
             $ind = '                              '
         }
         else { $ind = '                          ' }
         AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotTyp" />' -f (UpRef $slotIds.ValueType)))
-        AddS ($ind + ('<ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffset" />' -f $offFrom))
+        Add-FromFields $ind $offFrom $withRef
         AddS ($ind + ('<choose ParamRefId="{0}">' -f (UpRef $slotIds.ValueType)))
         AddS ($ind + '  <when test="1">')
-        AddS ($ind + ('    <ParameterRefRef RefId="{0}" HelpContext="IW-SlotOffsetBis" />' -f $offTo))
+        Add-ToFields ($ind + '    ') $offTo $withRef
         AddS ($ind + ('    <ParameterRefRef RefId="{0}" HelpContext="IW-SlotAggregation" />' -f (UpRef $slotIds.Aggregation)))
         AddS ($ind + '  </when>')
         AddS ($ind + '</choose>')
@@ -437,7 +523,17 @@ foreach ($key in $refOrder)
     $ids = @($byRef[$key] | ForEach-Object { $_.id })
     $label, $dpt, $size = $key -split '\|'
     AddS ('                    <when test="{0}">' -f (Format-TestList $ids))
-    AddS ('                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" />   <!-- {1}, {2} -->' -f $refIndex[$key], (Protect-Xml $label), $dpt)
+    if ($refIndexMs.ContainsKey($key))
+    {
+        AddS ('                      <choose ParamRefId="{0}">   <!-- globale Windeinheit -->' -f $windUnitRef)
+        AddS ('                        <when test="0"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" /></when>   <!-- {1}, km/h -->' -f $refIndex[$key], (Protect-Xml $label))
+        AddS ('                        <when test="1"><ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" /></when>   <!-- {1}, m/s -->' -f $refIndexMs[$key], (Protect-Xml $label))
+        AddS '                      </choose>'
+    }
+    else
+    {
+        AddS ('                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" />   <!-- {1}, {2} -->' -f $refIndex[$key], (Protect-Xml $label), $dpt)
+    }
     AddS '                    </when>'
 }
 AddS '                  </choose>'

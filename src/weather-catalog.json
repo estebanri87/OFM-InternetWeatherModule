@@ -56,7 +56,8 @@
     { "value": 0, "key": "mean", "label": "Mittelwert (Durchschnitt)" },
     { "value": 1, "key": "min",  "label": "Minimum" },
     { "value": 2, "key": "max",  "label": "Maximum" },
-    { "value": 3, "key": "sum",  "label": "Summe" }
+    { "value": 3, "key": "sum",  "label": "Summe" },
+    { "value": 4, "key": "range", "label": "Spannbreite (Maximum − Minimum)" }
   ],
 
   "categories": [

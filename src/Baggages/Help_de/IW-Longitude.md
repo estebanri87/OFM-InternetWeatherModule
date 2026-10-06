@@ -1,6 +1,6 @@
 ﻿### Längengrad
 
-Längengrad im Dezimalformat des Ortes, für den das Wetter bestimmt werden soll.
+Längengrad des Ortes im Dezimalformat. Östliche Längen sind positiv, westliche negativ.
 
 Beispiel: `16.3731` für Wien
 

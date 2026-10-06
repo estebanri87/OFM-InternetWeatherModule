@@ -24,10 +24,20 @@
 								<TypeText SizeInBit="8" />
 								<!-- 1 character -->
 							</ParameterType>
-							<ParameterType Id="%AID%_PT-WeatherLocationType" Name="WeatherLocation">
+							<!-- Ortswahl im Kanal. Die Orte selbst stehen zentral auf der Seite
+							     "Position und Richtung"; Werte wie upstream PT-WeatherChannelLocation,
+							     Wert 3 bleibt für einen weiteren Ort reserviert. -->
+							<ParameterType Id="%AID%_PT-IWLocation" Name="IWLocation" op:headerExport="enum" op:headerName="Location">
+								<TypeRestriction Base="Value" SizeInBit="2" UIHint="DropDown">
+									<Enumeration Text="Gerätestandort" Value="0" Id="%ENID%" op:headerName="Device" />
+									<Enumeration Text="Ort 1"          Value="1" Id="%ENID%" op:headerName="Location1" />
+									<Enumeration Text="Ort 2"          Value="2" Id="%ENID%" op:headerName="Location2" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWWindSpeedUnit" Name="IWWindSpeedUnit" op:headerExport="enum" op:headerName="WindSpeedUnit">
 								<TypeRestriction Base="Value" SizeInBit="1">
-									<Enumeration Text="Gerätestandort aus Allgemein" Value="0" Id="%ENID%" />
-									<Enumeration Text="Anderer Ort" Value="1" Id="%ENID%" />
+									<Enumeration Text="km/h" Value="0" Id="%ENID%" op:headerName="Kmh" />
+									<Enumeration Text="m/s"  Value="1" Id="%ENID%" op:headerName="Ms" />
 								</TypeRestriction>
 							</ParameterType>
 							<ParameterType Id="%AID%_PT-WeatherRefreshInterval" Name="WeatherRefreshInterval">
@@ -396,11 +406,12 @@
 							</ParameterType>
 
 							<ParameterType Id="%AID%_PT-IWAggregation" Name="IWAggregation" op:headerExport="enum" op:headerName="Aggregation">
-								<TypeRestriction Base="Value" SizeInBit="2" UIHint="DropDown">
+								<TypeRestriction Base="Value" SizeInBit="3" UIHint="DropDown">
 									<Enumeration Text="Mittelwert (Durchschnitt)" Value="0" Id="%ENID%" op:headerName="Mean" />
 									<Enumeration Text="Minimum" Value="1" Id="%ENID%" op:headerName="Min" />
 									<Enumeration Text="Maximum" Value="2" Id="%ENID%" op:headerName="Max" />
 									<Enumeration Text="Summe" Value="3" Id="%ENID%" op:headerName="Sum" />
+									<Enumeration Text="Spannbreite (Maximum − Minimum)" Value="4" Id="%ENID%" op:headerName="Range" />
 								</TypeRestriction>
 							</ParameterType>
 
@@ -409,6 +420,23 @@
 									<Enumeration Text="Nur bei Änderung" Value="0" Id="%ENID%" op:headerName="OnChange" />
 									<Enumeration Text="Bei jedem Abruf" Value="1" Id="%ENID%" op:headerName="Always" />
 								</TypeRestriction>
+							</ParameterType>
+
+							<ParameterType Id="%AID%_PT-IWFromRef" Name="IWFromRef" op:headerExport="enum" op:headerName="FromRef">
+								<TypeRestriction Base="Value" SizeInBit="1">
+									<Enumeration Text="relativ zu jetzt" Value="0" Id="%ENID%" op:headerName="Relative" />
+									<Enumeration Text="heute um" Value="1" Id="%ENID%" op:headerName="TodayAt" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWToRef" Name="IWToRef" op:headerExport="enum" op:headerName="ToRef">
+								<TypeRestriction Base="Value" SizeInBit="2" UIHint="DropDown">
+									<Enumeration Text="relativ zu jetzt" Value="0" Id="%ENID%" op:headerName="Relative" />
+									<Enumeration Text="heute um" Value="1" Id="%ENID%" op:headerName="TodayAt" />
+									<Enumeration Text="Tagesende" Value="2" Id="%ENID%" op:headerName="EndOfDay" />
+								</TypeRestriction>
+							</ParameterType>
+							<ParameterType Id="%AID%_PT-IWHourOfDay" Name="IWHourOfDay">
+								<TypeNumber SizeInBit="16" Type="signedInt" minInclusive="0" maxInclusive="23" />
 							</ParameterType>
 
 							<ParameterType Id="%AID%_PT-IWOffsetOpenweathermapHour" Name="IWOffsetOpenweathermapHour">
@@ -475,6 +503,23 @@
 								<!-- 1 byte empty after string -                                                                                   Offset="62"                                                        -->
 								<!-- 1 byte empty after string -                                                                                   Offset="63"                                                        -->
 							</Union>
+
+							<!-- Einheit der Windgeschwindigkeit, gilt für alle Kanäle -->
+							<Union SizeInBit="8">
+								<Memory CodeSegment="%MID%" Offset="230" BitOffset="0" />
+								<Parameter Id="%AID%_UP-%TT%00030" Name="WindSpeedUnit" ParameterType="%AID%_PT-IWWindSpeedUnit" Offset="0" BitOffset="0" Text="Windgeschwindigkeit in" Value="0" />
+							</Union>
+
+							<!-- Zentrale Orte (Seite "Position und Richtung"). Die Bezeichnung liegt nur in der ETS. -->
+							<Parameter Id="%AID%_P-%TT%00040" Name="Location1Name" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />
+							<Parameter Id="%AID%_P-%TT%00043" Name="Location2Name" ParameterType="%AID%_PT-Text40Byte" Text="Bezeichnung" Value="" />
+							<Union SizeInBit="128">
+								<Memory CodeSegment="%MID%" Offset="231" BitOffset="0" />
+								<Parameter Id="%AID%_UP-%TT%00041" Name="Location1Latitude"  ParameterType="%AID%_PT-Latitude"  Offset="0"  BitOffset="0" Text="Breitengrad" Value="52.518611" SuffixText="°N" />
+								<Parameter Id="%AID%_UP-%TT%00042" Name="Location1Longitude" ParameterType="%AID%_PT-Longitude" Offset="4"  BitOffset="0" Text="Längengrad"  Value="13.408333" SuffixText="°O" />
+								<Parameter Id="%AID%_UP-%TT%00044" Name="Location2Latitude"  ParameterType="%AID%_PT-Latitude"  Offset="8"  BitOffset="0" Text="Breitengrad" Value="48.2083"   SuffixText="°N" />
+								<Parameter Id="%AID%_UP-%TT%00045" Name="Location2Longitude" ParameterType="%AID%_PT-Longitude" Offset="12" BitOffset="0" Text="Längengrad"  Value="16.3731"   SuffixText="°O" />
+							</Union>
 						</Parameters>
 						<ParameterRefs>
 							<!-- OpenWeatherMap API Key -->
@@ -498,6 +543,15 @@
 							<ParameterRef Id="%AID%_UP-%TT%00020_R-%TT%0002001" RefId="%AID%_UP-%TT%00020" />
 							<ParameterRef Id="%AID%_UP-%TT%00021_R-%TT%0002101" RefId="%AID%_UP-%TT%00021" />
 							<ParameterRef Id="%AID%_UP-%TT%00022_R-%TT%0002201" RefId="%AID%_UP-%TT%00022" />
+							<!-- Windeinheit -->
+							<ParameterRef Id="%AID%_UP-%TT%00030_R-%TT%0003001" RefId="%AID%_UP-%TT%00030" />
+							<!-- Zentrale Orte -->
+							<ParameterRef Id="%AID%_P-%TT%00040_R-%TT%0004001" RefId="%AID%_P-%TT%00040" />
+							<ParameterRef Id="%AID%_UP-%TT%00041_R-%TT%0004101" RefId="%AID%_UP-%TT%00041" />
+							<ParameterRef Id="%AID%_UP-%TT%00042_R-%TT%0004201" RefId="%AID%_UP-%TT%00042" />
+							<ParameterRef Id="%AID%_P-%TT%00043_R-%TT%0004301" RefId="%AID%_P-%TT%00043" />
+							<ParameterRef Id="%AID%_UP-%TT%00044_R-%TT%0004401" RefId="%AID%_UP-%TT%00044" />
+							<ParameterRef Id="%AID%_UP-%TT%00045_R-%TT%0004501" RefId="%AID%_UP-%TT%00045" />
 						</ParameterRefs>
 						<ComObjectTable>
 							<!-- Refresh Weather Data -->
@@ -553,6 +607,9 @@
 								<!-- WeatherRefreshInterval -->
 								<ParameterRefRef RefId="%AID%_UP-%TT%00002_R-%TT%0000201" IndentLevel="1" HelpContext="IW-WeatherRefreshInterval" />
 
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="Einheiten" UIHint="Headline" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00030_R-%TT%0003001" IndentLevel="1" HelpContext="IW-WindEinheit" />
+
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Wetterbeschreibung als Text" UIHint="Headline" />
 								<ParameterSeparator Id="%AID%_PS-nnn" Text="Präfix-Symbol für Zeitraum:" />
 								<!-- WeatherConditionCurrentDayPrefix -->
@@ -571,6 +628,17 @@
 								<ParameterRefRef RefId="%AID%_UP-%TT%00008_R-%TT%0000801" HelpContext="IW-WeatherConditionSnow"             IndentLevel="1" />
 
 								<ComObjectRefRef RefId="%AID%_O-%TT%00001_R-%TT%0000101" />
+							</ParameterBlock>
+							<ParameterBlock Id="%AID%_PB-nnn" Name="IWLocations" Text="Position und Richtung" Icon="earth" HelpContext="IW-Orte">
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="Orte, auf die sich die Wetter-Kanäle beziehen können. Der Gerätestandort wird unter OpenKNX/Allgemein festgelegt." UIHint="Information" />
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="Ort 1" UIHint="Headline" />
+								<ParameterRefRef RefId="%AID%_P-%TT%00040_R-%TT%0004001"  IndentLevel="1" HelpContext="IW-OrtBezeichnung" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00041_R-%TT%0004101" IndentLevel="1" HelpContext="IW-Latitude" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00042_R-%TT%0004201" IndentLevel="1" HelpContext="IW-Longitude" />
+								<ParameterSeparator Id="%AID%_PS-nnn" Text="Ort 2" UIHint="Headline" />
+								<ParameterRefRef RefId="%AID%_P-%TT%00043_R-%TT%0004301"  IndentLevel="1" HelpContext="IW-OrtBezeichnung" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00044_R-%TT%0004401" IndentLevel="1" HelpContext="IW-Latitude" />
+								<ParameterRefRef RefId="%AID%_UP-%TT%00045_R-%TT%0004501" IndentLevel="1" HelpContext="IW-Longitude" />
 							</ParameterBlock>
 							<ParameterBlock Id="%AID%_PB-nnn" Name="IWKanalauswahl" Text="Kanalauswahl" Icon="format-list-bulleted-type" HelpContext="BASE-ChannelSelect">
 								<ParameterBlock Id="%AID%_PB-nnn" Inline="true" Layout="Grid">

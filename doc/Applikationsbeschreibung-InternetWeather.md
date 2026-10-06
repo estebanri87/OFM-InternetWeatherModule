@@ -20,12 +20,14 @@ Automatisierungslogik (Beschattung, Bewässerung, Heizungsführung) bildet das M
   - [Server-Basis-URL](#server-basis-url-open-meteo)
   - [API Key](#api-key-open-meteo)
   - [Automatische Aktualisierung](#automatische-aktualisierung)
+  - [Windgeschwindigkeit in](#windgeschwindigkeit-in)
+- [Position und Richtung](#position-und-richtung)
+  - [Bezeichnung](#bezeichnung-des-ortes) / [Breitengrad](#breitengrad) / [Längengrad](#längengrad)
 - [Kanal](#wetter-kanal)
   - [Ort](#ort)
-  - [Breitengrad](#breitengrad) / [Längengrad](#längengrad)
 - [Wert-Slots](#bezeichnung)
   - [Kategorie](#kategorie) / [Messwert](#messwert)
-  - [Typ](#typ) / [Offset](#offset) / [bis Offset](#bis-offset) / [Aggregation](#aggregation)
+  - [Typ](#typ) / [Zeitbezug](#zeitbezug) / [Offset](#offset) / [Uhrzeit](#uhrzeit) / [Ende](#ende) / [bis Offset](#bis-offset) / [Aggregation](#aggregation)
   - [Senden](#senden)
 - [Wetterbeschreibung als Text](#wolkenlos)
 - [Zeitebenen und Verfügbarkeit](#zeitebenen-und-verfügbarkeit)
@@ -141,15 +143,37 @@ Unabhängig vom Abrufintervall werden die ausgegebenen Werte **jede Minute** neu
 
 ---
 
-# Kanal
+<!-- DOC HelpContext="WindEinheit" -->
+## Windgeschwindigkeit in
 
-<!-- DOC HelpContext="WeatherLocationType" -->
-## Ort
+Einheit, in der alle Windgeschwindigkeiten und Windböen des Moduls ausgegeben werden.
 
-Ort, für den das Wetter bestimmt werden soll.
+* **km/h** — Datenpunkttyp 9.028 (Geschwindigkeit km/h).
+* **m/s** — Datenpunkttyp 9.005 (Geschwindigkeit m/s).
 
-* **Gerätestandort aus Allgemein** — Die Geo-Koordinaten aus den allgemeinen Geräteeinstellungen werden verwendet.
-* **Anderer Ort** — Die Geo-Koordinaten werden hier im Kanal eingestellt.
+Die Einstellung gilt für alle Kanäle. Der Datenpunkttyp der betroffenen Kommunikationsobjekte wird automatisch angepasst; bereits verknüpfte Gruppenadressen sollten nach einem Wechsel geprüft werden.
+
+<!-- DOCEND -->
+
+---
+
+<!-- DOC HelpContext="Orte" -->
+# Position und Richtung
+
+Auf dieser Seite werden zwei zusätzliche Orte zentral festgelegt. Jeder Kanal wählt anschließend nur noch, ob er den Gerätestandort, Ort 1 oder Ort 2 verwendet.
+
+Das spart Eingaben, wenn mehrere Kanäle denselben Ort abfragen, und eine Korrektur der Koordinaten wirkt sofort auf alle Kanäle dieses Ortes.
+
+Der Gerätestandort selbst wird wie bei allen OpenKNX-Modulen in den allgemeinen Geräteeinstellungen eingestellt.
+
+<!-- DOCEND -->
+
+---
+
+<!-- DOC HelpContext="OrtBezeichnung" -->
+## Bezeichnung des Ortes
+
+Freitext zur Dokumentation, zum Beispiel "Ferienhaus" oder "Garten". Die Bezeichnung wird nur in der ETS gespeichert und nicht auf das Gerät übertragen.
 
 <!-- DOCEND -->
 
@@ -158,7 +182,7 @@ Ort, für den das Wetter bestimmt werden soll.
 <!-- DOC HelpContext="Latitude" -->
 ## Breitengrad
 
-Breitengrad im Dezimalformat des Ortes, für den das Wetter bestimmt werden soll.
+Breitengrad des Ortes im Dezimalformat. Nördliche Breiten sind positiv, südliche negativ.
 
 Beispiel: `48.2083` für Wien
 
@@ -169,9 +193,23 @@ Beispiel: `48.2083` für Wien
 <!-- DOC HelpContext="Longitude" -->
 ## Längengrad
 
-Längengrad im Dezimalformat des Ortes, für den das Wetter bestimmt werden soll.
+Längengrad des Ortes im Dezimalformat. Östliche Längen sind positiv, westliche negativ.
 
 Beispiel: `16.3731` für Wien
+
+<!-- DOCEND -->
+
+---
+
+# Kanal
+
+<!-- DOC HelpContext="Ort" -->
+## Ort
+
+Ort, für den dieser Kanal das Wetter abruft.
+
+* **Gerätestandort** — Die Geo-Koordinaten aus den allgemeinen Geräteeinstellungen.
+* **Ort 1** und **Ort 2** — Die Geo-Koordinaten von der Seite "Position und Richtung".
 
 <!-- DOCEND -->
 
@@ -252,6 +290,37 @@ Die Zeile erscheint nur bei Messwerten, die sich sinnvoll zusammenfassen lassen.
 
 ---
 
+<!-- DOC HelpContext="SlotZeitbezug" -->
+## Zeitbezug
+
+Legt fest, worauf sich der Beginn des Wertes bezieht. Die Zeile erscheint nur bei Stunden- und 15-Minuten-Werten.
+
+* **relativ zu jetzt** — Der Beginn wird als Offset vom aktuellen Rasterschritt angegeben und wandert mit der Zeit mit.
+* **heute um** — Der Beginn ist eine feste Uhrzeit des heutigen Tages. Der Wert bleibt bis Mitternacht an dieser Uhrzeit und springt dann auf den Folgetag.
+
+Beispiel: "Temperatur - Stundenwerte", Einzelwert, heute um 14 Uhr, gibt den ganzen Tag die Temperatur um 14 Uhr aus.
+
+Tageswerte beziehen sich immer auf heute und haben deshalb keinen Zeitbezug.
+
+***Hinweis:*** Liegt die Uhrzeit bereits in der Vergangenheit, werden vergangene Werte benötigt. Diese liefert nur Open-Meteo. Bei OpenWeatherMap bleibt der Wert dann bis Mitternacht leer.
+
+<!-- DOCEND -->
+
+---
+
+<!-- DOC HelpContext="SlotUhrzeit" -->
+## Uhrzeit
+
+Volle Stunde des heutigen Tages, von 0 bis 23 Uhr, in lokaler Zeit.
+
+Als Beginn ist das die Stunde, mit der der Wert beginnt. Als Ende eines Intervalls ist es die letzte Stunde, die noch zum Intervall gehört. Bei 15-Minuten-Werten ist die Viertelstunde gemeint, die zur vollen Stunde beginnt.
+
+Beispiel: heute um 10 Uhr bis heute um 16 Uhr fasst bei Stundenwerten die sieben Stunden von 10:00 bis 16:59 zusammen.
+
+<!-- DOCEND -->
+
+---
+
 <!-- DOC HelpContext="SlotOffset" -->
 ## Offset
 
@@ -266,6 +335,25 @@ Positive Werte zeigen in die Zukunft, negative in die Vergangenheit. Beispiele: 
 Wie weit der Offset reichen darf, hängt vom Wetter-Service ab. Open-Meteo liefert 168 Stunden und 16 Tage voraus sowie 48 Stunden und 2 Tage zurück. OpenWeatherMap liefert 48 Stunden und 8 Tage voraus und kennt keine Vergangenheit; dort beginnt der Bereich bei 0.
 
 Bei "Intervall-Aggregationen" ist dies der **Beginn** des Intervalls.
+
+Die Zeile erscheint, wenn der Zeitbezug "relativ zu jetzt" gewählt ist oder der Messwert keinen Zeitbezug kennt.
+
+<!-- DOCEND -->
+
+---
+
+<!-- DOC HelpContext="SlotEnde" -->
+## Ende
+
+Legt bei "Intervall-Aggregationen" fest, wie das Ende des Intervalls angegeben wird. Die Zeile erscheint nur bei Stunden- und 15-Minuten-Werten.
+
+* **relativ zu jetzt** — Das Ende wird als Offset vom aktuellen Rasterschritt angegeben.
+* **heute um** — Das Ende ist eine feste Uhrzeit des heutigen Tages.
+* **Tagesende** — Das Intervall reicht bis zum letzten Rasterschritt des heutigen Tages, also bis 23 Uhr beziehungsweise 23:45 Uhr.
+
+Beispiel: "Temperatur - Stundenwerte", relativ zu jetzt mit Offset 0 bis Tagesende, Maximum, ergibt die höchste Temperatur, die heute noch zu erwarten ist. Im Lauf des Tages fallen immer mehr Stunden aus dem Intervall heraus.
+
+Liegt das Ende vor dem Beginn, wird kein Wert ausgegeben. Das kann bei "heute um" am Abend eintreten, wenn der Beginn relativ zu jetzt angegeben ist.
 
 <!-- DOCEND -->
 
@@ -295,8 +383,9 @@ Rechenvorschrift, mit der die Werte des Intervalls zu einem Wert zusammengefasst
 * **Minimum** — kleinster Wert im Intervall.
 * **Maximum** — größter Wert im Intervall.
 * **Summe** — Summe aller Werte im Intervall.
+* **Spannbreite (Maximum − Minimum)** — Abstand zwischen größtem und kleinstem Wert, zum Beispiel die Temperaturschwankung eines Tages.
 
-***Hinweis zur Einheit:*** "Summe" ist nur bei Mengengrößen wie Regen oder Schneefall physikalisch sinnvoll. Bei Raten- und Zustandsgrößen wie Temperatur, Wind oder Strahlung bleibt der Datenpunkttyp unverändert, obwohl die Summe eine andere physikalische Größe darstellt. Dort sind Mittelwert, Minimum oder Maximum die passende Wahl.
+***Hinweis zur Einheit:*** "Summe" ist nur bei Mengengrößen wie Regen oder Schneefall physikalisch sinnvoll. Bei Raten- und Zustandsgrößen wie Temperatur, Wind oder Strahlung bleibt der Datenpunkttyp unverändert, obwohl die Summe eine andere physikalische Größe darstellt. Dort sind Mittelwert, Minimum, Maximum oder Spannbreite die passende Wahl.
 
 <!-- DOCEND -->
 
@@ -376,8 +465,8 @@ Die folgende Übersicht zeigt, welche Messgröße auf welcher Zeitebene angebote
 | Gefühlte Temperatur | ✓ | ✓ | ✓ | Max/Min/Mittel | 9.001 |
 | Relative Luftfeuchte (2 m) | ✓ | ✓ | ✓ | | 9.007 |
 | Luftdruck | ✓ | | ✓ | | 9.006 |
-| Windgeschwindigkeit (10 m) | ✓ | ✓ | ✓ | Maximum | 9.028 |
-| Windböen (10 m) | ✓ | ✓ | ✓ | Maximum | 9.028 |
+| Windgeschwindigkeit (10 m) | ✓ | ✓ | ✓ | Maximum | 9.028 oder 9.005 |
+| Windböen (10 m) | ✓ | ✓ | ✓ | Maximum | 9.028 oder 9.005 |
 | Windrichtung (10 m) | ✓ | ✓ | ✓ | vorherrschend | 5.003 |
 | Niederschlag | ✓ | ✓ | ✓ | Summe | 9.026 |
 | Regen | ✓ | ✓ | ✓ | Summe | 9.026 |

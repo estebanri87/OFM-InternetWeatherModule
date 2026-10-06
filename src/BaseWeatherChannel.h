@@ -60,7 +60,7 @@ class BaseWeatherChannel : public OpenKNX::Channel
     const char* textHelperVar(uint8_t which) const;
 
   private:
-    void buildRequest(WeatherRequest& request) const;
+    void buildRequest(WeatherRequest& request, time_t now) const;
     void publishSlot(uint8_t slotIndex, time_t now);
     void buildWeatherText(char* target, uint8_t slotIndex, time_t now) const;
     void addVar(WeatherLevelRequest& lr, const char* var) const;
@@ -83,6 +83,7 @@ class BaseWeatherChannel : public OpenKNX::Channel
     uint32_t _lastFetchMs = 0;
     uint32_t _nextFetchMs = 0;
     uint32_t _lastEvaluateMs = 0;
+    int16_t _lastDay = -1; // Tag im Jahr der letzten Auswertung, für den Abruf nach Mitternacht
     bool _fetchPending = false;
     int16_t _lastHttpStatus = 0;
 };

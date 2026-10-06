@@ -3,8 +3,8 @@
 #include <math.h>
 
 // Fasst die Werte eines Intervalls zu einem Wert zusammen.
-// NAN steht fuer "kein Wert vorhanden" und wird uebersprungen.
-// Rueckgabe false, wenn kein einziger gueltiger Wert dabei war.
+// NAN steht für "kein Wert vorhanden" und wird übersprungen.
+// Rückgabe false, wenn kein einziger gültiger Wert dabei war.
 inline bool weatherAggregate(const float* values, uint8_t count, PT_Aggregation mode, float& out)
 {
     if (values == nullptr || count == 0) return false;
@@ -41,6 +41,7 @@ inline bool weatherAggregate(const float* values, uint8_t count, PT_Aggregation 
         case PT_Aggregation::Min: out = minValue; break;
         case PT_Aggregation::Max: out = maxValue; break;
         case PT_Aggregation::Sum: out = sum; break;
+        case PT_Aggregation::Range: out = maxValue - minValue; break;
         default: out = sum / (float)valid; break;
     }
     return true;

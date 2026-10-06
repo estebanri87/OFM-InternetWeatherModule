@@ -12,3 +12,5 @@ Wie weit der Offset reichen darf, hängt vom Wetter-Service ab. Open-Meteo liefe
 
 Bei "Intervall-Aggregationen" ist dies der **Beginn** des Intervalls.
 
+Die Zeile erscheint, wenn der Zeitbezug "relativ zu jetzt" gewählt ist oder der Messwert keinen Zeitbezug kennt.
+
