@@ -230,6 +230,8 @@ Bei Tageswerten ist die Aggregation bereits Teil des Messwerts, weil beide Diens
 
 Der Datenpunkttyp des Kommunikationsobjekts richtet sich automatisch nach dem gewählten Messwert.
 
+Die Angabe in Klammern ist die Messhöhe über Grund nach meteorologischem Standard: Temperatur und Luftfeuchte werden in **2 m** Höhe bestimmt, Wind in **10 m** Höhe. Wind in Bodennähe ist durch Gebäude und Bewuchs meist deutlich schwächer.
+
 ***Hinweis:*** 15-Minuten-Werte liefert Open-Meteo nur dort, wo ein entsprechend hoch aufgelöstes Wettermodell verfügbar ist, also in Mitteleuropa und Nordamerika. Außerhalb dieser Gebiete bleibt der Wert leer. OpenWeatherMap kennt diese Zeitebene gar nicht.
 
 <!-- DOCEND -->

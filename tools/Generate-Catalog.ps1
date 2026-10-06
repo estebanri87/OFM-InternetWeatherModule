@@ -118,6 +118,18 @@ foreach ($m in $catalog.measurements)
     $byDpt[$key] += $m
 }
 
+# Varianten des Kommunikationsobjekts: eine je Messgröße, nicht je DPT-Klasse.
+# Die Objektfunktion trägt den Namen der Größe; bei einer Variante je DPT-Klasse
+# hätten sich z.B. Temperatur, gefühlte Temperatur und Taupunkt einen Namen geteilt.
+$refOrder = @(); $byRef = @{}
+foreach ($m in $catalog.measurements)
+{
+    $key = "$($m.label)|$($m.dpt)|$($m.objectSize)"
+    if (-not $byRef.ContainsKey($key)) { $byRef[$key] = @(); $refOrder += $key }
+    $byRef[$key] += $m
+}
+if ($refOrder.Count -gt 99) { throw "Mehr als 99 KO-Varianten je Slot - die Ref-Id ist zweistellig." }
+
 Write-Host ("Katalog geprüft: {0} Messwerte, {1} eindeutige headerNames, {2} DPT-Klassen" -f `
     $catalog.measurements.Count, $names.Count, $dptOrder.Count)
 foreach ($p in $catalog.providers)
@@ -330,15 +342,14 @@ AddS '              <ComObject Id="%AID%_O-%TT%%CC%%SPP+0%" Number="%K%SK%%" Nam
 AddS '            </ComObjectTable>'
 AddS ''
 AddS '            <ComObjectRefs>'
-$dptRefIndex = @{}
-for ($i = 0; $i -lt $dptOrder.Count; $i++)
+$refIndex = @{}
+for ($i = 0; $i -lt $refOrder.Count; $i++)
 {
-    $key = $dptOrder[$i]
-    $dpt, $size = $key -split '\|'
-    $dptRefIndex[$key] = $i + 1
-    $sample = $byDpt[$key][0]
+    $key = $refOrder[$i]
+    $label, $dpt, $size = $key -split '\|'
+    $refIndex[$key] = $i + 1
     AddS ('              <ComObjectRef Id="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" RefId="%AID%_O-%TT%%CC%%SPP+0%" ObjectSize="{1}" DatapointType="{2}" Text="{{{{0:Wert %SL%}}}}" FunctionText="Wetter %C% %SL%: Ausgang, {3}" TextParameterRefId="{4}" />' -f `
-        ($i + 1), $size, $dpt, (Protect-Xml $sample.label), (PRef $slotIds.Label))
+        ($i + 1), $size, $dpt, (Protect-Xml $label), (PRef $slotIds.Label))
 }
 AddS '            </ComObjectRefs>'
 AddS '          </Static>'
@@ -421,12 +432,12 @@ AddS ('                      <ParameterRefRef RefId="{0}" HelpContext="IW-SlotSe
 AddS '                    </when>'
 AddS '                  </choose>'
 AddS ('                  <choose ParamRefId="{0}">' -f (UpRef $slotIds.Shadow))
-foreach ($key in $dptOrder)
+foreach ($key in $refOrder)
 {
-    $ids = @($byDpt[$key] | ForEach-Object { $_.id })
-    $dpt, $size = $key -split '\|'
+    $ids = @($byRef[$key] | ForEach-Object { $_.id })
+    $label, $dpt, $size = $key -split '\|'
     AddS ('                    <when test="{0}">' -f (Format-TestList $ids))
-    AddS ('                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" />   <!-- {1} -->' -f $dptRefIndex[$key], $dpt)
+    AddS ('                      <ComObjectRefRef RefId="%AID%_O-%TT%%CC%%SPP+0%_R-%TT%%CC%%SPP+0%{0:00}" />   <!-- {1}, {2} -->' -f $refIndex[$key], (Protect-Xml $label), $dpt)
     AddS '                    </when>'
 }
 AddS '                  </choose>'
